@@ -1,7 +1,10 @@
-<script setup></script>
+<script setup>
+import FuncionarioView from './views/FuncionarioView.vue';
+
+</script>
 <template>
   <main>
-    <RouterView />
+    <FuncionarioView />
   </main>
 </template>
 
