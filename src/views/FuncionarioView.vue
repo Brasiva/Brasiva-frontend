@@ -70,6 +70,7 @@ export default {
 <template>
     <div>
     <h1>Funcionários</h1>
+    <h2>Informe-se sobre os funcionários e suas ocupações</h2>
 
     <button @click="novoFuncionario">
         + Adicionar Funcionário
@@ -96,3 +97,12 @@ export default {
     />
     </div>
 </template>
+
+<style scoped>
+    h1 {
+    font-family: 'Unbounded', sans-serif;
+    }
+    h2 {
+        font-family: 'Urbanist', sans-serif;
+    }
+</style>

@@ -25,7 +25,7 @@ export default {
     <p>Salário: R$ {{ funcionario.salario }}</p>
     <p>Cargo: {{ funcionario.cargo }}</p>
 
-    <button @click="$emit('editar', funcionario)">✏️</button>
-    <button @click="$emit('excluir', funcionario.id)">🗑️</button>
+    <button @click="$emit('editar', funcionario)"><font-awesome-icon icon="fa-solid fa-user-pen" /></button>
+    <button @click="$emit('excluir', funcionario.id)"><font-awesome-icon icon="fa-solid fa-trash-can" /></button>
   </div>
 </template>
