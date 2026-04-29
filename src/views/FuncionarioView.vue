@@ -105,4 +105,11 @@ export default {
     h2 {
         font-family: 'Urbanist', sans-serif;
     }
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(4, 300px);
+        gap: 30px;
+        padding: 20px;
+        justify-content: space-between;
+    }
 </style>
