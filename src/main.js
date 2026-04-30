@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import "@fontsource/unbounded";
 import "@fontsource/urbanist";
+import "@fontsource/imbue";
 
 import App from './App.vue'
 import router from './router'
