@@ -1,24 +1,19 @@
 <template>
+  <OfflineBanner />
+  
   <router-view />
 </template>
 
 <script setup>
-// Não é necessário importar componentes aqui, o Router cuida disso!
+import OfflineBanner from './components/OfflineBanner.vue';
 </script>
 
 <style>
-/* Estilos globais para resetar margens e ocupar a tela cheia */
+/* Seus estilos globais permanecem iguais */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-
-body, html, #app {
-  width: 100%;
-  height: 100%;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f5f5f5;
-  overflow: hidden;
-}
+/* ... */
 </style>
