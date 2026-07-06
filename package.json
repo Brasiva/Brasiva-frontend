@@ -13,6 +13,9 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@fontsource/imbue": "^5.2.8",
+    "@fontsource/unbounded": "^5.2.8",
+    "@fontsource/urbanist": "^5.2.7",
     "axios": "^1.18.1",
     "pinia": "^3.0.4",
     "vue": "^3.5.38",
