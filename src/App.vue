@@ -1,11 +1,19 @@
-<script setup></script>
-
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <OfflineBanner />
+  
+  <router-view />
 </template>
 
-<style scoped></style>
+<script setup>
+import OfflineBanner from './components/OfflineBanner.vue';
+</script>
+
+<style>
+/* Seus estilos globais permanecem iguais */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+/* ... */
+</style>
