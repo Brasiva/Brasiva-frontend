@@ -6,13 +6,36 @@
       </div>
       
       <nav class="sidebar-menu">
-        <router-link to="/home" class="menu-item">Página Inicial</router-link>
-        <router-link to="/calendario" class="menu-item">Calendário</router-link>
-        <router-link to="/cardapio" class="menu-item">Cardápio</router-link>
-        <router-link to="/estoque" class="menu-item">Estoque</router-link>
-        <router-link to="/funcionarios" class="menu-item">Funcionários</router-link>
-        <router-link to="/orcamento" class="menu-item">Orçamento</router-link>
-      </nav>
+  <router-link to="/home" class="menu-item">
+    <font-awesome-icon icon="home" class="menu-icon" />
+    Página Inicial
+  </router-link>
+  
+  <router-link to="/calendario" class="menu-item">
+    <font-awesome-icon icon="calendar-days" class="menu-icon" />
+    Calendário
+  </router-link>
+  
+  <router-link to="/cardapio" class="menu-item">
+    <font-awesome-icon icon="utensils" class="menu-icon" />
+    Cardápio
+  </router-link>
+  
+  <router-link to="/estoque" class="menu-item">
+    <font-awesome-icon icon="boxes-stacked" class="menu-icon" />
+    Estoque
+  </router-link>
+  
+  <router-link to="/funcionarios" class="menu-item">
+    <font-awesome-icon icon="users" class="menu-icon" />
+    Funcionários
+  </router-link>
+  
+  <router-link to="/orcamento" class="menu-item">
+    <font-awesome-icon icon="file-invoice-dollar" class="menu-icon" />
+    Orçamento
+  </router-link>
+</nav>
     </aside>
 
     <main class="dashboard-content">
