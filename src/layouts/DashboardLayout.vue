@@ -83,4 +83,13 @@
   color: #d97706;
   font-weight: bold;
 }
+h2 {
+  color: #fffaf0;
+  font-family: 'Imbue', sans-serif;
+  font-weight: 100;
+  font-size: 3.5rem;
+  display: block;
+  text-align: center;
+  margin: 24px 0 50px 0;
+}
 </style>
