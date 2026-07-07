@@ -11,8 +11,14 @@ import Menu from '../views/MenuView.vue'
 import Stock from '../views/StockView.vue'
 import Employee from '../views/EmployeeView.vue'
 import Budget from '../views/BudgetView.vue'
+import PaginaInicial from '../views/PaginaInicialView.vue'
 
 const routes = [
+  {
+   path: '/inicio',
+   name: 'PaginaInicial',
+   component: PaginaInicial
+ },
   // Rotas de Autenticação (Fundo escuro/fogo)
   {
     path: '/auth',
