@@ -130,9 +130,7 @@ const irLogin = () => {
   transform: scale(.97);
 }
 
-/* ===========================
-   DESKTOP
-=========================== */
+/* DESKTOP */
 
 @media (min-width: 768px) {
 

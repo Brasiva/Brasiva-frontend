@@ -11,13 +11,25 @@ import Menu from '../views/MenuView.vue'
 import Stock from '../views/StockView.vue'
 import Employee from '../views/EmployeeView.vue'
 import Budget from '../views/BudgetView.vue'
-import PaginaInicial from '../views/PaginaInicialView.vue'
+import PaginaInicial from '../views/cadastro/PaginaInicialView.vue'
+import CadastroView from '../views/cadastro/CadastroView.vue'
+import LoginView from '../views/cadastro/LoginView.vue'
 
 const routes = [
   {
    path: '/inicio',
    name: 'PaginaInicial',
    component: PaginaInicial
+ },
+ {
+   path: '/cadastro',
+   name: 'Cadastro',
+   component: CadastroView
+ },
+ {
+   path: '/login',
+   name: 'Login',
+   component: LoginView
  },
   // Rotas de Autenticação (Fundo escuro/fogo)
   {
