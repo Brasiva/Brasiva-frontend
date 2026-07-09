@@ -300,6 +300,7 @@ button:disabled {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    margin: 0 0 0 12vw
   }
 
   .branding h1 {
