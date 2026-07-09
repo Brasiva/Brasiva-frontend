@@ -1,6 +1,5 @@
 <template>
   <OfflineBanner />
-  
   <router-view />
 </template>
 
