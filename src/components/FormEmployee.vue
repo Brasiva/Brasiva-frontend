@@ -11,9 +11,10 @@ export default {
         nome: '',
         salario: '',
         cargo: '',
-        foto: ''
+        foto: null // Alterado para receber o arquivo bruto
       },
-      preview: ''
+      preview: '',
+      arquivoFoto: null // Variável temporária para guardar o arquivo real
     }
   },
   watch: {
@@ -23,6 +24,7 @@ export default {
         if (novo) {
           this.dados = { ...novo }
           this.preview = novo.foto
+          this.arquivoFoto = null // Reseta o arquivo ao mudar de funcionário
         }
       }
     }
@@ -33,18 +35,25 @@ export default {
 
       if (!file) return
 
-      const reader = new FileReader()
+      // Guarda o arquivo binário real para enviar ao backend
+      this.arquivoFoto = file
 
+      // Gera o preview visual na tela
+      const reader = new FileReader()
       reader.onload = (e) => {
         this.preview = e.target.result
-        this.dados.foto = e.target.result
       }
-
       reader.readAsDataURL(file)
     },
 
     salvar() {
-      this.$emit('salvar', this.dados)
+      // Cria uma cópia dos dados e injeta o arquivo bruto se ele existir
+      const dadosParaSalvar = { ...this.dados }
+      if (this.arquivoFoto) {
+        dadosParaSalvar.foto = this.arquivoFoto
+      }
+      
+      this.$emit('salvar', dadosParaSalvar)
     },
 
     cancelar() {
@@ -53,7 +62,6 @@ export default {
   }
 }
 </script>
-
 <template>
   <div class="form-card">
     <h3>

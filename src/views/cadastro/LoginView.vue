@@ -1,13 +1,11 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-// 1. Importar a mesma store do Pinia que criamos
 import { useAuthStore } from "@/stores/auth.js";
 
 const router = useRouter();
-const authStore = useAuthStore(); // Instanciar a store
+const authStore = useAuthStore();
 
-// Estados do formulário
 const email = ref("");
 const senha = ref("");
 
@@ -15,13 +13,10 @@ const irCadastro = () => {
   router.push("/cadastro");
 };
 
-// 2. Chamar a Action de login e validar a entrada
 const handleLogin = async () => {
   const sucesso = await authStore.login(email.value, senha.value);
-
   if (sucesso) {
-    // Redireciona para a página interna principal (ex: Home/Dashboard)
-    router.push("/");
+    router.push("/home");
   }
 };
 
@@ -32,11 +27,11 @@ const recuperarSenha = () => {
 
 <template>
   <div class="pagina">
-    <div class="container-flex">
+    <div class="bg-imagem"></div>
 
+    <div class="container-flex">
       <div class="branding">
         <h1>BRASIVA</h1>
-        <p class="subtitulo">Gerenciamento completo.</p>
 
         <div class="sessao-cadastro-desktop">
           <p>BEM VINDO DE VOLTA!<br><span>Crie uma nova conta agora mesmo.</span></p>
@@ -52,7 +47,7 @@ const recuperarSenha = () => {
         <form @submit.prevent="handleLogin" class="formulario" :class="{ 'em-carregamento': authStore.loading }">
           <div class="campo">
             <label for="email">EMAIL</label>
-            <input type="email" id="email" v-model="email" placeholder="Insira seu email para continuar" :disabled="authStore.loading" required />
+            <input name="email" id="email" autocomplete="email" v-model="email" placeholder="Insira seu email para continuar" :disabled="authStore.loading" required />
           </div>
 
           <div class="campo">
@@ -61,7 +56,7 @@ const recuperarSenha = () => {
           </div>
 
           <button type="button" class="link-esqueci" :disabled="authStore.loading" @click="recuperarSenha">
-            Esqueceu sua senha? Clique aqui
+            Esqueci minha senha
           </button>
 
           <button type="submit" class="botao-principal" :disabled="authStore.loading">
@@ -80,7 +75,6 @@ const recuperarSenha = () => {
 </template>
 
 <style scoped>
-
 .error-message {
   color: #c0392b;
   background-color: #fdecea;
@@ -107,6 +101,7 @@ button:disabled {
   transform: none !important;
 }
 
+/* MOBILE FIRST */
 .pagina {
   min-height: 100vh;
   width: 100%;
@@ -114,14 +109,30 @@ button:disabled {
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  color: white;
+  position: relative;
+  overflow: hidden; /* Importante para segurar o fundo rotacionado */
+  color: rgb(255, 255, 255);
   font-family: "Poppins", sans-serif;
-  background: url("../img/background-image.png") center center / cover no-repeat;
   padding: 2rem 1rem;
   box-sizing: border-box;
 }
 
+/* Elemento do Background */
+.bg-imagem {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  /* Imagem em pé (vertical) padrão para Mobile */
+  background: url("../img/background-image.png") center center / cover no-repeat;
+  transition: transform 0.3s ease;
+}
+
 .container-flex {
+  position: relative;
+  z-index: 2; /* Mantém os inputs e textos acima do fundo */
   width: 100%;
   max-width: 420px;
   display: flex;
@@ -136,37 +147,32 @@ button:disabled {
 
 .branding h1 {
   font-family: "Imbue", serif;
-  font-size: 3.5rem;
-  font-weight: 300;
-  line-height: 1;
-  color: #FF4800;
-  margin: 0;
-}
-
-.subtitulo {
-  font-size: 1rem;
-  margin-top: 0.2rem;
+  font-size: 4rem;
   font-weight: 400;
+  line-height: 1;
+  color: #ffffff; /* Combinando com a home */
+  margin: 0 0 1rem 0;
 }
 
+/* Card mais transparente com blur sutil */
 .card-login {
   width: 100%;
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.27); /* Alterado de 0.65 para mais transparência */
+  backdrop-filter: blur(10px);
   border-radius: 15px;
   padding: 2rem 1.5rem;
   box-sizing: border-box;
-  color: #000000;
+  color: #000000; /* Texto branco para dar contraste na caixa escura */
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .card-login h2 {
   font-size: 1.3rem;
   font-weight: 800;
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   letter-spacing: 0.5px;
 }
-
 
 .formulario {
   display: flex;
@@ -181,32 +187,35 @@ button:disabled {
 }
 
 .campo label {
-  font-size: 0.85rem;
+  font-size: 1.2rem;
   font-weight: 700;
 }
 
+/* Inputs semi-transparentes */
 .campo input {
   width: 100%;
-  height: 35px;
-  border: 1px solid #999;
-  border-radius: 4px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+  border-color: black;
   padding: 0 0.7rem;
   box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.45);
+  color: #ffffff;
   font-family: "Poppins", sans-serif;
   font-size: 0.9rem;
 }
 
 .campo input::placeholder {
-  color: #999;
+  color: #dddddd;
   font-size: 0.75rem;
 }
 
 .link-esqueci {
   background: none;
   border: none;
-  color: #e63900;
-  font-size: 0.75rem;
+  color: #ffffff;
+  font-size: 0.90rem;
   font-family: "Poppins", sans-serif;
   cursor: pointer;
   text-align: center;
@@ -214,14 +223,14 @@ button:disabled {
   text-decoration: underline;
 }
 
-/* Botões */
+/* Botões com tom laranja claro da home */
 .botao-principal {
   width: 60%;
-  height: 35px;
+  height: 38px;
   margin: 0.5rem auto 0 auto;
   border: none;
   border-radius: 999px;
-  background: #FF4800;
+  background: #FF9500; /* Laranja Claro */
   color: white;
   font-size: 0.9rem;
   font-weight: 700;
@@ -230,13 +239,13 @@ button:disabled {
 }
 
 .botao-principal:hover {
-  background: #ff6627;
+  background: #ffa826;
   transform: translateY(-2px);
 }
 
 /* Seções Alternativas (Ir para Cadastro) */
 .sessao-cadastro-desktop {
-  display: none; /* Oculto no mobile */
+  display: none;
 }
 
 .sessao-cadastro-mobile {
@@ -259,11 +268,11 @@ button:disabled {
 
 .botao-secundario {
   width: 200px;
-  height: 35px;
+  height: 38px;
   border: none;
   border-radius: 999px;
-  background: #FF4800;
-  color: white;
+  background: #FF9500; /* Laranja Claro */
+  color: rgb(0, 0, 0);
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
@@ -271,16 +280,25 @@ button:disabled {
 }
 
 .botao-secundario:hover {
-  background: #ff6627;
+  background: #ffa826;
   transform: translateY(-2px);
 }
 
-/* DESKTOP RESPONSIVO*/
-
+/* DESKTOP RESPONSIVO (Imagens na Horizontal) */
 @media (min-width: 768px) {
   .pagina {
     justify-content: center;
     padding: 0 10%;
+  }
+
+  /* Gira e inverte as proporções da imagem vertical para simular a horizontal */
+  .bg-imagem {
+    width: 100vh;
+    height: 100vw;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-90deg);
+    transform-origin: center;
   }
 
   .container-flex {
@@ -292,7 +310,6 @@ button:disabled {
     gap: 4rem;
   }
 
-
   .branding {
     text-align: left;
     margin-bottom: 0;
@@ -300,16 +317,11 @@ button:disabled {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    margin: 0 0 0 12vw
+    margin: 0 0 0 12vw;
   }
 
   .branding h1 {
-    font-size: 5.5rem;
-  }
-
-  .subtitulo {
-    font-size: 1.4rem;
-    margin-bottom: 4rem;
+    font-size: 6.5rem;
   }
 
   .sessao-cadastro-desktop {
@@ -317,10 +329,9 @@ button:disabled {
     text-align: left;
   }
 
-
   .card-login {
     max-width: 450px;
-    padding: 2.5rem 2rem;
+    padding: 5rem 4rem;
   }
 
   .sessao-cadastro-mobile {

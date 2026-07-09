@@ -15,171 +15,167 @@ const irLogin = () => {
 
 <template>
   <div class="pagina">
+    <div class="bg-imagem"></div>
 
     <div class="conteudo">
       <h1>BRASIVA</h1>
 
-      <p class="subtitulo">
-        Gerenciamento completo.
-      </p>
-
-      <InstallButton class="instalar" />
-
       <div class="botoes">
-        <button class="botao" @click="irCadastro">
-          CADASTRAR-SE
-        </button>
-
         <button class="botao" @click="irLogin">
           FAZER LOGIN
         </button>
+        
+        <button class="botao" @click="irCadastro">
+          CADASTRAR-SE
+        </button>
       </div>
+    </div>
+
+    <div class="container-instalar">
+      <InstallButton class="instalar" />
     </div>
   </div>
 </template>
 
 <style scoped>
+/* MOBILE FIRST */
 .pagina {
   min-height: 100vh;
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  position: relative;
+  overflow: hidden; /* Evita barras de rolagem ao rotacionar o fundo no desktop */
 
   color: white;
   font-family: "Poppins", sans-serif;
+  padding: 2rem;
+  box-sizing: border-box;
+}
 
+/* Elemento do Background */
+.bg-imagem {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  /* Imagem em pé (vertical) padrão para Mobile */
   background: url("../img/background-image.png") center center / cover no-repeat;
+  transition: transform 0.3s ease;
 }
 
 .conteudo {
+  position: relative;
+  z-index: 2; /* Fica por cima do fundo */
   width: 100%;
-  max-width: 420px;
-
-
+  max-width: 320px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-
-  text-align: center;
-
-  padding: 2rem;
+  gap: 2.5rem;
 }
 
 .conteudo h1 {
   font-family: "Imbue", serif;
-  font-size: 4rem;
+  font-optical-sizing: auto;
   font-weight: 300;
+  font-style: normal;
+  font-size: 4rem;
   line-height: 1;
-}
-
-.conteudo p {
-  margin-top: .2rem;
-  margin-bottom: 2rem;
-  color: white;
-  font-size: 1.15rem;
-  font-weight: 400;
+  letter-spacing: 2px;
   text-align: center;
+  margin: 0 0 8vw 0;
 }
 
-.subtitulo{
-    margin-top: .3rem;
-    margin-bottom: .8rem;
-}
-
-.instalar{
-    margin-bottom: 2rem;
-}
 
 .botoes {
   width: 100%;
-
   display: flex;
   flex-direction: column;
-
   align-items: center;
-
-  gap: 1rem;
+  gap: 1.2rem;
 }
 
 .botao {
-  width: 230px;
-  height: 35px;
+  width: 100%;
+  max-width: 260px;
+  height: 30px;
 
   border: none;
   border-radius: 999px;
 
-  background: #FF4800;
+  background: #FF9500;
   color: white;
 
-  font-size: .95rem;
+  font-size: 0.95rem;
   font-weight: 700;
+  letter-spacing: 0.5px;
 
   cursor: pointer;
-
-  transition: .25s;
+  transition: transform 0.2s, background 0.2s;
 }
 
 .botao:hover {
-  background: #ff6627;
-  transform: translateY(-2px);
+  background: #ffa826;
+  transform: scale(1.02);
 }
 
 .botao:active {
-  transform: scale(.97);
+  transform: scale(0.98);
 }
 
-/* DESKTOP */
+/* Container do botão de instalar no Mobile */
+.container-instalar {
+  position: absolute;
+  bottom: 2.5rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 2;
+}
 
+/* DESKTOP (Telas maiores) */
 @media (min-width: 768px) {
-
   .pagina {
-    justify-content: flex-start;
-    padding-left: 8%;
-  }
-
-  .conteudo {
-    max-width: 500px;
-    align-items: center;   /* continua centralizado */
-    text-align: center;
-  }
-
-  .conteudo h1 {
-    font-size: 6rem;
-  }
-
-  .subtitulo {
-    font-size: 1.3rem;
-    margin-top: .2rem;
-    margin-bottom: .8rem;
-    text-align: center;
-    width: 100%;
-  }
-
-  .instalar {
-    margin-bottom: 2.5rem;
-  }
-
-  .botoes {
-    position: fixed;
-    left: 50%;
-    top: 58%;
-    transform: translateX(-50%);
-    bottom: 12%;
-
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-
-    width: 260px;
+    justify-content: center;
     align-items: center;
   }
 
+  .bg-imagem {
+    width: 100vh;  /* Inverte proporções para cobrir tudo após girar */
+    height: 100vw;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-90deg); /* Rotaciona a imagem em pé para ficar deitada */
+    transform-origin: center;
+  }
+
+  .conteudo {
+    max-width: 450px;
+    gap: 3.5rem;
+  }
+
+  .conteudo h1 {
+    font-size: 6.5rem;
+    margin: 0;
+  }
+
   .botao {
-    width: 230px;
+    max-width: 250px;
     height: 40px;
     font-size: 1rem;
+  }
+
+  .container-instalar {
+    position: absolute;
+    bottom: 2.5rem;
+    right: 4rem;
+    width: auto;
+    justify-content: flex-end;
   }
 }
 </style>

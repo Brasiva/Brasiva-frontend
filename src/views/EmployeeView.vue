@@ -1,116 +1,122 @@
 <script>
 import EmployeeCard from '../components/EmployeeCard.vue'
 import FormEmployee from '../components/FormEmployee.vue'
+import { mapActions, mapState } from 'pinia'
+import { useFuncionarioStore } from '../stores/funcionarios'
 
 export default {
     components: {
-    EmployeeCard,
-    FormEmployee
+        EmployeeCard,
+        FormEmployee
     },
 
     data() {
-    return {
-        funcionarios: [],
+        return {
+            mostrarForm: false,
+            modoEdicao: false,
+            funcionarioSelecionado: null
+        }
+    },
 
-        mostrarForm: false,
-        modoEdicao: false,
+    computed: {
+        // Mapeia a lista reativa vinda do backend
+        ...mapState(useFuncionarioStore, ['funcionarios', 'carregando', 'erro'])
+    },
 
-        funcionarioSelecionado: null
-    }
+    mounted() {
+        // Busca os dados do backend real assim que carregar a página
+        this.buscarFuncionarios()
     },
 
     methods: {
-    // abrir novo
-    novoFuncionario() {
-        this.modoEdicao = false
-        this.funcionarioSelecionado = null
-        this.mostrarForm = true
-    },
+        ...mapActions(useFuncionarioStore, [
+            'buscarFuncionarios', 
+            'adicionarFuncionario', 
+            'atualizarFuncionario', 
+            'removerFuncionario'
+        ]),
 
-    // abrir edição
-    editarFuncionario(func) {
-        this.modoEdicao = true
-        this.funcionarioSelecionado = func
-        this.mostrarForm = true
-    },
+        novoFuncionario() {
+            this.modoEdicao = false
+            this.funcionarioSelecionado = null
+            this.mostrarForm = true
+        },
 
-    // excluir
-    excluirFuncionario(id) {
-        this.funcionarios = this.funcionarios.filter(f => f.id !== id)
-    },
+        editarFuncionario(func) {
+            this.modoEdicao = true
+            this.funcionarioSelecionado = func
+            this.mostrarForm = true
+        },
 
-    // salvar (novo ou edição)
-    salvarFuncionario(dados) {
-    if (this.modoEdicao) {
-        const index = this.funcionarios.findIndex(f => f.id === dados.id)
-        this.funcionarios[index] = dados
-    } else {
-        dados.id = Date.now()
-        this.funcionarios.push(dados)
-    }
+        async excluirFuncionario(id) {
+            if (confirm("Deseja realmente excluir este funcionário?")) {
+                await this.removerFuncionario(id)
+            }
+        },
 
-    this.fecharForm()
-    },
+        async salvarFuncionario(dados) {
+            try {
+                if (this.modoEdicao) {
+                    await this.atualizarFuncionario(this.funcionarioSelecionado.id, dados)
+                } else {
+                    await this.adicionarFuncionario(dados)
+                }
+                this.fecharForm()
+            } catch (error) {
+                alert("Falha ao salvar registro no servidor.")
+            }
+        },
 
-    fecharForm() {
-        this.mostrarForm = false
-        this.funcionarioSelecionado = null
-    }
+        fecharForm() {
+            this.mostrarForm = false
+            this.funcionarioSelecionado = null
+        }
     }
 }
 </script>
 
 <template>
     <div class="content">
-    <div class="header-page">
-        <div class="title">
-        <h1>Funcionários</h1>
-        <h2>Informe-se sobre os funcionários e suas ocupações</h2>
+        <div class="header-page">
+            <div class="title">
+                <h1>Funcionários</h1>
+                <h2>Informe-se sobre os funcionários e suas ocupações</h2>
+            </div>
+
+            <button @click="novoFuncionario">
+                + Adicionar Funcionário
+            </button>
+        </div>
+        
+        <div v-if="carregando" class="status-info">Carregando dados...</div>
+        <div v-if="erro" class="status-error">{{ erro }}</div>
+
+        <div class="grid">
+            <EmployeeCard
+                v-for="func in funcionarios"
+                :key="func.id"
+                :funcionario="func"
+                @editar="editarFuncionario"
+                @excluir="excluirFuncionario"
+            />
         </div>
 
-        <button @click="novoFuncionario">
-            + Adicionar Funcionário
-        </button>
-    </div>
-    
-
-    <!-- LISTA -->
-    <div class="grid">
-        <EmployeeCard
-        v-for="func in funcionarios"
-        :key="func.id"
-        :funcionario="func"
-        @editar="editarFuncionario"
-        @excluir="excluirFuncionario"
-        />
-    </div>
-
-    <!-- FORM (APARECE SÓ QUANDO CLICA) -->
-    <!-- MODAL -->
-    <div v-if="mostrarForm" class="overlay">
-
-        <FormEmployee
-            :funcionario="funcionarioSelecionado"
-            :modoEdicao="modoEdicao"
-            @salvar="salvarFuncionario"
-            @cancelar="fecharForm"
-        />
-
-    </div>
+        <div v-if="mostrarForm" class="overlay">
+            <FormEmployee
+                :funcionario="funcionarioSelecionado"
+                :modoEdicao="modoEdicao"
+                @salvar="salvarFuncionario"
+                @cancelar="fecharForm"
+            />
+        </div>
     </div>
 </template>
 
 <style scoped>
-    .title h1,
-    .title h2 {
-        margin: 4px;
-    }
-    .content .header-page .title h1 {
-    font-family: 'Unbounded', sans-serif;
-    }
-    .content .header-page .title h2 {
-        font-family: 'Urbanist', sans-serif;
-    }
+    /* Seus estilos mantidos originais */
+    .title h1, .title h2 { margin: 4px; }
+    .content .header-page .title h1 { font-family: 'Unbounded', sans-serif; }
+    .content .header-page .title h2 { font-family: 'Urbanist', sans-serif; }
     .content .grid {
         display: grid;
         grid-template-columns: repeat(3, 380px);
@@ -128,31 +134,12 @@ export default {
         font-weight: bold;
         font-size: 1.1rem;
     }
-    .header-page {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px;
-    }
-
-    .title {
-        display: flex;
-        flex-direction: column;
-    }
+    .header-page { display: flex; justify-content: space-between; align-items: center; padding: 20px; }
+    .title { display: flex; flex-direction: column; }
     .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-
-        width: 100vw;
-        height: 100vh;
-
-        background: rgba(0, 0, 0, 0.4);
-
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        z-index: 999;
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(0, 0, 0, 0.4); display: flex; justify-content: center; align-items: center; z-index: 999;
     }
+    .status-info { padding: 20px; color: #FF9500; font-weight: bold; }
+    .status-error { padding: 20px; color: red; font-weight: bold; }
 </style>
