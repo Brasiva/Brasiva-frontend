@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 
 // URL exata baseada no teu arquivo urls.py do Django
-const API_URL = 'http://localhost:8000/api/funcionarios/' 
+const API_URL = `${import.meta.env.VITE_API_URL}/api/funcionarios/`; 
 
 export const useFuncionarioStore = defineStore('funcionarios', {
   state: () => ({

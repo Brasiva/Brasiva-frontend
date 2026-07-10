@@ -159,7 +159,7 @@ button:disabled {
   width: 100%;
   height: 100%;
   z-index: 1;
-  background: url("../img/background-image.png") center center / cover no-repeat;
+  background: url("@/assets/background-image.png") center center / cover no-repeat;
   transition: transform 0.3s ease;
 }
 
