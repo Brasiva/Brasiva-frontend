@@ -64,7 +64,7 @@ const irLogin = () => {
   height: 100%;
   z-index: 1;
   /* Imagem em pé (vertical) padrão para Mobile */
-  background: url("../img/background-image.png") center center / cover no-repeat;
+  background: url("@/assets/background-image.png") center center / cover no-repeat;
   transition: transform 0.3s ease;
 }
 

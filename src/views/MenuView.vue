@@ -3,7 +3,7 @@
     
     <div class="cardapio-header">
       <div class="textos-topo">
-        <h2>Cardápio </h2>
+        <h2>Cardápio</h2>
         <p>Organize e monte os pratos com suas receitas.</p>
       </div>
       <button @click="abrirModalNovoPrato" class="btn-adicionar">
@@ -23,7 +23,7 @@
           @click="selecionarPrato(prato.id)"
         >
           <div class="placeholder-imagem-card">
-            <span class="icon-prato">🍽️</span>
+            <i class="fa-solid fa-utensils"></i>
           </div>
           <div class="faixa-titulo">
             {{ (prato.nome || '').toUpperCase() }}
@@ -33,7 +33,7 @@
         <div v-else class="card-prato-detalhado">
           <div class="detalhe-coluna-esquerda">
             <div class="placeholder-imagem-detalhe">
-              <span class="icon-prato-grande">🥘</span>
+              <i class="fa-solid fa-bowl-food"></i>
             </div>
             
             <div class="modo-fazer-container">
@@ -285,7 +285,11 @@ const deletarPrato = (id) => {
   align-items: center;
   justify-content: center;
 }
-.icon-prato { font-size: 2.5rem; }
+
+.placeholder-imagem-card i{
+    font-size:60px;
+    color:#FF9500;
+}
 
 .faixa-titulo {
   background-color: #FF9500;
@@ -316,7 +320,11 @@ const deletarPrato = (id) => {
   align-items: center;
   justify-content: center;
 }
-.icon-prato-grande { font-size: 3.5rem; }
+
+.placeholder-imagem-detalhe i{
+    font-size:90px;
+    color:#FF9500;
+}
 
 .modo-fazer-container h5 { margin: 0.8rem 0 0.2rem 0; text-decoration: underline; }
 .modo-fazer-container p { font-size: 0.8rem; line-height: 1.4; margin: 0; }
