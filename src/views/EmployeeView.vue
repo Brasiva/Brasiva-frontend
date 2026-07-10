@@ -113,33 +113,176 @@ export default {
 </template>
 
 <style scoped>
-    /* Seus estilos mantidos originais */
-    .title h1, .title h2 { margin: 4px; }
-    .content .header-page .title h1 { font-family: 'Unbounded', sans-serif; }
-    .content .header-page .title h2 { font-family: 'Urbanist', sans-serif; }
+
+.content {
+    width: 100%;
+    padding: 15px;
+}
+
+/* ================= HEADER ================= */
+
+.header-page {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.title {
+    display: flex;
+    flex-direction: column;
+}
+
+.title h1 {
+    margin: 0;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.5rem;
+    color: #FF9500;
+}
+
+.title h2 {
+    margin: 5px 0 0;
+    font-family: 'Urbanist', sans-serif;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+
+/* BOTÃO */
+
+.content button {
+    border: none;
+    background-color: #FF9500;
+    border-radius: 15px;
+    padding: 10px 18px;
+    color: white;
+    font-family: 'Urbanist', sans-serif;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 100%;
+    transition: .3s;
+}
+
+.content button:hover {
+    background-color: #e78700;
+}
+
+
+/* ================= GRID ================= */
+
+.content .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 10px;
+}
+
+
+/* ================= FORM OVERLAY ================= */
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    background: rgba(0,0,0,0.45);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 15px;
+
+    z-index: 999;
+}
+
+
+/* ================= STATUS ================= */
+
+.status-info {
+    padding: 15px;
+    color: #FF9500;
+    font-weight: bold;
+    font-family: 'Urbanist';
+}
+
+.status-error {
+    padding: 15px;
+    color: red;
+    font-weight: bold;
+    font-family: 'Urbanist';
+}
+
+
+/* ================================================= */
+/* TABLET */
+/* ================================================= */
+
+@media (min-width: 600px) {
+
+    .header-page {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+
+    .content button {
+        width: auto;
+    }
+
+
+    .title h1 {
+        font-size: 1.8rem;
+    }
+
+
     .content .grid {
-        display: grid;
-        grid-template-columns: repeat(3, 380px);
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+    }
+
+}
+
+
+/* ================================================= */
+/* DESKTOP */
+/* ================================================= */
+
+@media (min-width: 1024px) {
+
+    .content {
+        padding: 25px;
+    }
+
+
+    .title h1 {
+        font-size: 2rem;
+    }
+
+
+    .title h2 {
+        font-size: 1rem;
+    }
+
+
+    .content .grid {
+        grid-template-columns: repeat(3, minmax(280px, 1fr));
         gap: 30px;
         padding: 20px;
-        justify-content: space-between;
     }
+
+
     .content button {
-        border-style: none;
-        background-color: #FF9500;
-        border-radius: 20px;
-        padding: 5px 10px;
-        color: white;
-        font-family: 'Urbanist';
-        font-weight: bold;
         font-size: 1.1rem;
+        padding: 12px 22px;
     }
-    .header-page { display: flex; justify-content: space-between; align-items: center; padding: 20px; }
-    .title { display: flex; flex-direction: column; }
-    .overlay {
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(0, 0, 0, 0.4); display: flex; justify-content: center; align-items: center; z-index: 999;
-    }
-    .status-info { padding: 20px; color: #FF9500; font-weight: bold; }
-    .status-error { padding: 20px; color: red; font-weight: bold; }
+
+}
+
 </style>
