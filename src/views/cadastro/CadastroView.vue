@@ -29,15 +29,15 @@ const handleRegister = async () => {
 
 <template>
   <div class="pagina">
-    <div class="bg-imagem"></div>
+    <div class="orange-glow"></div>
 
     <div class="container-flex">
 
       <div class="branding">
-        <h1>BRASIVA</h1>
-        
+        <h1 class="logo">BRASIVA</h1>
+
         <div class="sessao-login-desktop">
-          <p>SEJA BEM VINDO!<br><span>Acesse sua conta agora mesmo.</span></p>
+          <p>SEJA BEM-VINDO!<br><span>Acesse sua conta agora mesmo.</span></p>
           <button class="botao-secundario" :disabled="authStore.loading" @click="irLogin">FAZER LOGIN</button>
         </div>
       </div>
@@ -50,28 +50,34 @@ const handleRegister = async () => {
         <form @submit.prevent="handleRegister" class="formulario" :class="{ 'em-carregamento': authStore.loading }">
           <div class="campo">
             <label for="nome">NOME</label>
-            <input type="text" id="nome" v-model="nome" :disabled="authStore.loading" required />
+            <div class="input-wrapper">
+              <input type="text" id="nome" v-model="nome" placeholder="Seu nome completo" :disabled="authStore.loading" required />
+            </div>
           </div>
 
           <div class="campo">
             <label for="email">EMAIL</label>
-            <input type="email" id="email" v-model="email" placeholder="Insira seu email para continuar" :disabled="authStore.loading" required />
+            <div class="input-wrapper">
+              <input type="email" id="email" v-model="email" placeholder="seu@email.com" :disabled="authStore.loading" required />
+            </div>
           </div>
 
           <div class="campo">
             <label for="senha">SENHA</label>
-            <input type="password" id="senha" v-model="senha" :disabled="authStore.loading" required />
+            <div class="input-wrapper">
+              <input type="password" id="senha" v-model="senha" placeholder="••••••••" :disabled="authStore.loading" required />
+            </div>
           </div>
 
           <button type="submit" class="botao-principal" :disabled="authStore.loading">
             {{ authStore.loading ? "CADASTRANDO..." : "REGISTRAR" }}
           </button>
         </form>
-      </div>
 
-      <div class="sessao-login-mobile">
-        <p>SEJA BEM VINDO!<br><span>Acesse sua conta agora mesmo.</span></p>
-        <button class="botao-secundario" :disabled="authStore.loading" @click="irLogin">FAZER LOGIN</button>
+        <div class="sessao-login-mobile">
+          <p>SEJA BEM-VINDO!<br><span>Acesse sua conta agora mesmo.</span></p>
+          <button class="botao-secundario" :disabled="authStore.loading" @click="irLogin">FAZER LOGIN</button>
+        </div>
       </div>
 
     </div>
@@ -79,66 +85,38 @@ const handleRegister = async () => {
 </template>
 
 <style scoped>
-.error-message {
-  color: #c0392b;
-  background-color: #fdecea;
-  border: 1px solid #e74c3c;
-  border-radius: 6px;
-  padding: 10px 14px;
-  margin-bottom: 1.2rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-align: center;
-}
-
-.em-carregamento {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-button:disabled, input:disabled {
-  cursor: not-allowed !important;
-}
-
-button:disabled {
-  background: #999 !important;
-  transform: none !important;
-}
-
-/* MOBILE FIRST */
 .pagina {
   min-height: 100vh;
   width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   position: relative;
-  overflow: hidden; /* Segura o fundo rotacionado */
-  color: white;
+  overflow: hidden;
+  background-color: #161316;
+  color: #FFFFFF;
   font-family: "Poppins", sans-serif;
-  padding: 0.4rem 0.1rem;
+  padding: 1.5rem 1rem;
   box-sizing: border-box;
 }
 
-/* Elemento do Background */
-.bg-imagem {
+.orange-glow {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: -80px;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(255, 109, 41, 0.35) 0%, rgba(22, 19, 22, 0) 70%);
+  filter: blur(50px);
+  pointer-events: none;
   z-index: 1;
-  /* Imagem em pé (vertical) padrão para Mobile */
-  background: url("@/assets/background-image.png") center center / cover no-repeat;
-  transition: transform 0.3s ease;
 }
 
 .container-flex {
   position: relative;
-  z-index: 2; /* Mantém os elementos acima da imagem */
+  z-index: 2;
   width: 100%;
-  max-width: 420px;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -149,30 +127,29 @@ button:disabled {
   margin-bottom: 1.5rem;
 }
 
-.branding h1 {
+.logo {
   font-family: "Imbue", serif;
-  font-size: 4rem;
-  font-weight: 400;
+  font-size: 3.5rem;
+  font-weight: 300;
   line-height: 1;
   color: #ffffff;
-  margin: 0 0 1rem 0;
+  margin: 0;
+  text-shadow: 0 0 15px rgba(255, 109, 41, 0.3);
 }
 
-/* Card mais transparente com desfoque de fundo */
 .card-cadastro {
   width: 100%;
-  background: rgba(255, 255, 255, 0.249); /* Alterado de 0.65 para maior transparência */
-  backdrop-filter: blur(10px);
-  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  border-radius: 20px;
   padding: 2rem 1.5rem;
   box-sizing: border-box;
-  color: #000000; /* Texto claro para contraste */
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .card-cadastro h2 {
-  font-size: 1.3rem;
-  font-weight: 800;
+  font-size: 1.25rem;
+  font-weight: 700;
   text-align: center;
   margin-bottom: 1.5rem;
   letter-spacing: 0.5px;
@@ -187,52 +164,57 @@ button:disabled {
 .campo {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.4rem;
 }
 
 .campo label {
-  font-size: 1.2rem;
-  font-weight: 700;
-}
-
-/* Inputs adaptados para a nova transparência */
-.campo input {
-  width: 100%;
-  height: 38px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 6px;
-  border-color: black;
-  padding: 0 0.7rem;
-  box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.45);
-  color: #ffffff;
-  font-family: "Poppins", sans-serif;
-  font-size: 0.9rem;
-}
-
-.campo input::placeholder {
-  color: #dddddd;
   font-size: 0.75rem;
+  font-weight: 700;
+  color: #BABABA;
+  letter-spacing: 0.5px;
 }
 
-/* Botões atualizados para o Laranja Claro (#FF9500) */
-.botao-principal {
-  width: 60%;
-  height: 38px;
-  margin: 0.5rem auto 0 auto;
+.input-wrapper {
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  height: 44px;
+}
+
+.input-wrapper input {
+  width: 100%;
+  background: transparent;
   border: none;
-  border-radius: 999px;
-  background: #FF9500;
+  outline: none;
+  color: #FFFFFF;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.85rem;
+}
+
+.input-wrapper input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.botao-principal {
+  width: 100%;
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #FF6D29 0%, #453027 100%);
   color: white;
   font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
-  transition: 0.25s;
+  transition: transform 0.2s, opacity 0.2s;
+  margin-top: 0.5rem;
 }
 
 .botao-principal:hover {
-  background: #ffa826;
   transform: translateY(-2px);
+  opacity: 0.95;
 }
 
 .sessao-login-desktop {
@@ -241,63 +223,70 @@ button:disabled {
 
 .sessao-login-mobile {
   text-align: center;
-  margin-top: 2.5rem;
-  width: 100%;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .sessao-login-mobile p, .sessao-login-desktop p {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 0.9rem;
+  font-weight: 600;
   line-height: 1.3;
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
+  color: #FFFFFF;
 }
 
 .sessao-login-mobile p span, .sessao-login-desktop p span {
   font-weight: 400;
-  font-size: 0.95rem;
+  font-size: 0.8rem;
+  color: #BABABA;
 }
 
 .botao-secundario {
-  width: 180px;
-  height: 38px;
-  border: none;
-  border-radius: 999px;
-  background: #FF9500;
-  color: rgb(0, 0, 0);
-  font-size: 0.85rem;
+  width: 100%;
+  height: 40px;
+  border: 1px solid rgba(255, 109, 41, 0.4);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #FFFFFF;
+  font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
-  transition: 0.25s;
+  transition: transform 0.2s, background 0.2s;
 }
 
 .botao-secundario:hover {
-  background: #ffa826;
+  background: rgba(255, 109, 41, 0.1);
   transform: translateY(-2px);
 }
 
-/* DESKTOP RESPONSIVO (Gira o Fundo para a Horizontal) */
-@media (min-width: 768px) {
-  .pagina {
-    justify-content: center;
-    padding: 0 10%;
-  }
+.error-message {
+  color: #ff5252;
+  background-color: rgba(255, 82, 82, 0.1);
+  border: 1px solid rgba(255, 82, 82, 0.3);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 1rem;
+  font-size: 0.8rem;
+  text-align: center;
+}
 
-  /* Gira a imagem vertical simulando proporção horizontal estável */
-  .bg-imagem {
-    width: 100vh;
-    height: 100vw;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(-90deg);
-    transform-origin: center;
+.em-carregamento {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* DESKTOP RESPONSIVO */
+@media (min-width: 768px) {
+  .orange-glow {
+    width: 600px;
+    height: 600px;
   }
 
   .container-flex {
-    max-width: 1100px;
+    max-width: 900px;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
-    width: 100%;
     gap: 4rem;
   }
 
@@ -305,25 +294,24 @@ button:disabled {
     text-align: left;
     margin-bottom: 0;
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
   }
 
-  .branding h1 {
-    font-size: 6.5rem;
-    margin: 0 0 2rem 0;
+  .logo {
+    font-size: 5.5rem;
+    margin-bottom: 1.5rem;
   }
 
   .sessao-login-desktop {
     display: block;
-    text-align: left;
   }
-  
+
+  .sessao-login-desktop .botao-secundario {
+    width: 180px;
+  }
 
   .card-cadastro {
-    max-width: 450px;
-    padding: 5rem 4rem;
+    max-width: 400px;
+    padding: 3rem 2.5rem;
   }
 
   .sessao-login-mobile {

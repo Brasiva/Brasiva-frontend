@@ -25,9 +25,7 @@ export const useFuncionarioStore = defineStore("funcionarios", {
   }),
 
   actions: {
-    // ============================
-    // LISTAR FUNCIONÁRIOS
-    // ============================
+  
     async buscarFuncionarios() {
       this.carregando = true;
       this.erro = null;
