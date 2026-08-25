@@ -1,0 +1,568 @@
+html,
+body,
+#app {
+  margin: 0;
+  min-height: 100%;
+}
+
+html {
+  background-color: #f4f5f7;
+  transition: background-color 0.25s ease;
+}
+
+body {
+  min-height: 100vh;
+  background-color: #f4f5f7;
+  color: #333;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+#app {
+  min-height: 100vh;
+  background-color: #f4f5f7;
+  transition: background-color 0.25s ease;
+}
+
+/* =========================
+   TEMA ESCURO GLOBAL
+========================= */
+
+html.dark-mode,
+html.dark-mode body,
+html.dark-mode #app {
+  background-color: #181a1b !important;
+  color: #eeeeee !important;
+}
+
+/* Views */
+
+html.dark-mode .page-layout {
+  min-height: 100vh;
+  background-color: #181a1b !important;
+  color: #eeeeee !important;
+}
+
+html.dark-mode .main-content {
+  background-color: #181a1b !important;
+}
+
+html.dark-mode .page-body {
+  background-color: #181a1b !important;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+html.dark-mode .sidebar {
+  background-color: #202324 !important;
+  color: #eeeeee !important;
+}
+
+html.dark-mode .sidebar a,
+html.dark-mode .mobile-sidebar,
+html.dark-mode .mobile-sidebar-header,
+html.dark-mode .sidebar button,
+html.dark-mode .sidebar span,
+html.dark-mode .sidebar p,
+html.dark-mode .sidebar h1,
+html.dark-mode .sidebar h2,
+html.dark-mode .sidebar h3 {
+  color: #eeeeee;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+html.dark-mode .evento-card,
+html.dark-mode .profile-card,
+html.dark-mode .settings-card,
+html.dark-mode .card,
+html.dark-mode .metric-card,
+html.dark-mode .pedido-card,
+html.dark-mode .modal-content,
+html.dark-mode .list-box,
+html.dark-mode .date-picker-mock {
+  background-color: #222526 !important;
+  color: #eeeeee !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* =========================
+   TEXTOS
+========================= */
+
+html.dark-mode h1,
+html.dark-mode h2,
+html.dark-mode h3,
+html.dark-mode h4,
+html.dark-mode h5,
+html.dark-mode h6,
+html.dark-mode strong,
+html.dark-mode label {
+  color: #eeeeee !important;
+}
+
+html.dark-mode p,
+html.dark-mode small {
+  color: #999999;
+}
+
+html.dark-mode span {
+  color: inherit;
+}
+
+/* =========================
+   INFO BOX
+========================= */
+
+html.dark-mode .info-block,
+html.dark-mode .info-box {
+  background-color: #2b2e30 !important;
+}
+
+html.dark-mode .info-block small,
+html.dark-mode .info-box small {
+  color: #999999 !important;
+}
+
+html.dark-mode .info-block span,
+html.dark-mode .info-block strong,
+html.dark-mode .info-box span,
+html.dark-mode .info-box strong {
+  color: #eeeeee !important;
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+html.dark-mode input,
+html.dark-mode textarea,
+html.dark-mode select {
+  background-color: #2b2e30 !important;
+  color: #eeeeee !important;
+  border-color: #45494c !important;
+}
+
+html.dark-mode input::placeholder,
+html.dark-mode textarea::placeholder {
+  color: #888888 !important;
+}
+
+/* =========================
+   CONFIGURAÇÕES
+========================= */
+
+html.dark-mode .setting-item,
+html.dark-mode .about-box {
+  background-color: #2b2e30 !important;
+}
+
+html.dark-mode .setting-icon {
+  background-color: #35383a !important;
+  color: #cccccc !important;
+}
+
+/* =========================
+   DIVISORES
+========================= */
+
+html.dark-mode .divider {
+  background-color: #383b3d !important;
+}
+
+/* =========================
+   MODAIS
+========================= */
+
+html.dark-mode .modal-overlay {
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
+html.dark-mode .close-btn {
+  color: #eeeeee !important;
+}
+
+/* =========================
+   BOTÕES SECUNDÁRIOS
+========================= */
+
+html.dark-mode .cancel-btn,
+html.dark-mode .btn-cancel {
+  background-color: #2b2e30 !important;
+  border-color: #45494c !important;
+  color: #eeeeee !important;
+}
+
+html.dark-mode .cancel-btn:hover,
+html.dark-mode .btn-cancel:hover {
+  background-color: #35383a !important;
+}
+
+/* =========================
+   TÍTULOS
+========================= */
+
+html.dark-mode .title {
+  color: #eeeeee !important;
+}
+
+html.dark-mode .subtitle {
+  color: #999999 !important;
+}
+
+/* =========================
+   TRANSIÇÃO
+========================= */
+
+html,
+body,
+#app,
+.page-layout,
+.main-content,
+.page-body,
+.sidebar,
+.evento-card,
+.profile-card,
+.settings-card,
+.metric-card,
+.pedido-card,
+.info-block,
+.info-box,
+.setting-item,
+.about-box,
+.modal-content,
+.list-box,
+input,
+textarea,
+select {
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+/* ============================= */
+/* SIDEBAR FIX (ITEM ATIVO & HOVER) */
+/* ============================= */
+
+/* Remove o fundo branco quando o item está selecionado ou focado */
+html.dark-mode .sidebar-menu a.router-link-active,
+html.dark-mode .toggle-sidebar,
+html.dark-mode .menu-item:hover:not(.router-link-active),
+html.dark-mode .footer-item:hover,
+html.dark-mode .sidebar .router-link-active,
+html.dark-mode .sidebar-menu a.router-link-exact-active,
+html.dark-mode .sidebar-menu button.active,
+html.dark-mode .sidebar-menu li.active {
+  background-color: rgba(255, 109, 41, 0.15) !important; /* Laranja suave */
+  color: #FF6D29 !important; /* Laranja da marca */
+  border-radius: 12px;
+}
+
+/* Força os ícones do item ativo a ficarem laranjas */
+html.dark-mode .sidebar-menu a.router-link-active .material-symbols-outlined,
+html.dark-mode .sidebar-menu a.router-link-exact-active .material-symbols-outlined,
+html.dark-mode .sidebar-menu a.router-link-active svg,
+html.dark-mode .sidebar-menu a.router-link-exact-active svg {
+  color: #FF6D29 !important;
+  fill: #FF6D29 !important;
+}
+
+/* ============================= */
+/* BANNER DE BOAS-VINDAS FIX */
+/* ============================= */
+
+html.dark-mode .welcome-banner,
+html.dark-mode [class*="welcome"],
+html.dark-mode [class*="banner"] {
+  background: rgba(255, 255, 255, 0.03) !important;
+  background-color: #222526 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #FFFFFF !important;
+}
+
+html.dark-mode .welcome-banner h1,
+html.dark-mode .welcome-banner h2,
+html.dark-mode .welcome-banner p,
+html.dark-mode .welcome-banner span {
+  color: #FFFFFF !important;
+}
+
+/* ============================= */
+/* BOTÕES DE FILTRO E AÇÃO */
+/* ============================= */
+
+/* Ajuste para o botão "Filtrar" ao lado de "Ver todos" */
+html.dark-mode .btn-filter,
+html.dark-mode button:has(span:contains("Filtrar")) {
+  background-color: #2b2e30 !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+/* ============================= */
+/* SIDEBAR MOBILE - TEMA ESCURO */
+/* ============================= */
+
+html.dark-mode .mobile-nav {
+  background-color: #202324 !important;
+  border: 1px solid #303436 !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+html.dark-mode .mobile-item {
+  color: #9ca3af !important;
+  background-color: transparent !important;
+}
+
+html.dark-mode .mobile-item:hover {
+  background-color: #2b2e30 !important;
+  color: #eeeeee !important;
+}
+
+/* Item selecionado */
+html.dark-mode .mobile-nav .router-link-active {
+  background-color: #ff9500 !important;
+  color: #ffffff !important;
+}
+
+/* Botão menu */
+html.dark-mode .mobile-menu-button {
+  color: #9ca3af !important;
+  background-color: transparent !important;
+}
+
+/* Fundo atrás do menu */
+html.dark-mode .mobile-overlay {
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Menu lateral mobile */
+html.dark-mode .mobile-sidebar {
+  background-color: #202324 !important;
+  color: #eeeeee !important;
+  box-shadow: -5px 0 25px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Cabeçalho */
+html.dark-mode .mobile-sidebar-header {
+  background-color: #202324 !important;
+  border-bottom-color: #383b3d !important;
+}
+
+html.dark-mode .mobile-sidebar-header h2 {
+  color: #eeeeee !important;
+}
+
+html.dark-mode .mobile-sidebar-header p {
+  color: #999999 !important;
+}
+
+/* Botão fechar */
+html.dark-mode .close-mobile-menu {
+  background-color: #2b2e30 !important;
+  color: #eeeeee !important;
+}
+
+html.dark-mode .close-mobile-menu:hover {
+  background-color: #35383a !important;
+}
+
+/* Itens do menu */
+html.dark-mode .mobile-sidebar-item {
+  background-color: transparent !important;
+  color: #9ca3af !important;
+}
+
+html.dark-mode .mobile-sidebar-item:hover {
+  background-color: #2b2e30 !important;
+  color: #eeeeee !important;
+}
+
+/* Item ativo */
+html.dark-mode .mobile-sidebar-item.router-link-active {
+  background-color: rgba(255, 149, 0, 0.15) !important;
+  color: #ff9500 !important;
+  border-left-color: #ff9500 !important;
+}
+
+/* Ícones */
+html.dark-mode .mobile-sidebar-item .material-symbols-outlined {
+  color: inherit !important;
+}
+
+/* Rodapé */
+html.dark-mode .mobile-sidebar-footer {
+  background-color: #202324 !important;
+  border-top-color: #383b3d !important;
+}
+
+/* Logout */
+html.dark-mode .logout-mobile {
+  color: #ef5350 !important;
+}
+
+html.dark-mode .logout-mobile:hover {
+  background-color: rgba(239, 83, 80, 0.12) !important;
+  color: #ef5350 !important;
+}
+html.dark-mode .calendar-container{background:#222526!important;color:#eee!important}
+html.dark-mode .calendar-header h2{color:#eee!important}
+html.dark-mode .year-label,.dark-mode .weekdays-grid span{color:#999!important}
+html.dark-mode .day-cell{background:#2b2e30!important;border-color:#3b3f41!important}
+html.dark-mode .day-cell:hover{background:#35383a!important}
+html.dark-mode .day-cell.vazio{background:transparent!important;border-color:transparent!important}
+html.dark-mode .day-cell.today{background:#3a2d20!important;border-color:#ff9500!important}
+html.dark-mode .day-number{color:#eee!important}
+html.dark-mode .today .day-number{background:#ff9500!important;color:#fff!important}
+html.dark-mode .legend-box{background:#2b2e30!important}
+html.dark-mode .legend-box h4,.dark-mode .legend-items{color:#bbb!important}
+html.dark-mode .calendar-actions button:first-child{background:#2b2e30!important;color:#eee!important;border-color:#45494c!important}
+html.dark-mode .modal-content{background:#222526!important;color:#eee!important}
+html.dark-mode .modal-content h3{color:#eee!important}
+html.dark-mode .close-btn{background:#35383a!important;color:#eee!important}
+
+/* ================= ESTOQUE - DARK MODE ================= */
+
+html.dark-mode .stock-summary .summary-card,
+html.dark-mode .filters-card,
+html.dark-mode .product-card,
+html.dark-mode .empty-state,
+html.dark-mode .modal-content {
+  background-color:#222526 !important;
+  color:#eee !important;
+}
+
+html.dark-mode .title,
+html.dark-mode .product-info h3,
+html.dark-mode .summary-card strong,
+html.dark-mode .stock-info strong,
+html.dark-mode .product-footer strong {
+  color:#eee !important;
+}
+
+html.dark-mode .subtitle,
+html.dark-mode .summary-card small,
+html.dark-mode .category,
+html.dark-mode .stock-info small,
+html.dark-mode .product-footer span,
+html.dark-mode .empty-state p {
+  color:#999 !important;
+}
+
+html.dark-mode .filters-card,
+html.dark-mode .search-box {
+  background-color:#222526 !important;
+}
+
+html.dark-mode .search-box,
+html.dark-mode .stock-info,
+html.dark-mode .icon-button,
+html.dark-mode .close-button,
+html.dark-mode .btn-secondary {
+  background-color:#2b2e30 !important;
+  color:#eee !important;
+}
+
+html.dark-mode .search-box input,
+html.dark-mode .filters-card select,
+html.dark-mode .input-group input,
+html.dark-mode .input-group select {
+  background-color:#2b2e30 !important;
+  color:#eee !important;
+  border-color:#45494c !important;
+}
+
+html.dark-mode .search-box input::placeholder {
+  color:#888 !important;
+}
+
+html.dark-mode .stock-bar {
+  background-color:#383b3d !important;
+}
+
+html.dark-mode .modal-header h2,
+html.dark-mode .input-group label,
+html.dark-mode .empty-state h3 {
+  color:#eee !important;
+}
+
+html.dark-mode .modal-header p {
+  color:#999 !important;
+}
+
+html.dark-mode .modal-overlay {
+  background:rgba(0,0,0,.7) !important;
+}
+
+/* =========================
+   LISTA DE COMPRAS - DARK MODE
+========================= */
+
+html.dark-mode .lista-compras-modal,
+html.dark-mode .modal {
+  background-color: #222526 !important;
+  color: #eeeeee !important;
+}
+
+html.dark-mode .modal h2,
+html.dark-mode .modal h3,
+html.dark-mode .modal strong {
+  color: #eeeeee !important;
+}
+
+html.dark-mode .modal p,
+html.dark-mode .modal small,
+html.dark-mode .modal span {
+  color: #999999;
+}
+
+html.dark-mode .modal .item {
+  background-color: #2b2e30 !important;
+  color: #eeeeee !important;
+}
+
+html.dark-mode .modal .quantidade strong {
+  color: #ffb74d !important;
+}
+
+html.dark-mode .modal .close {
+  background-color: #35383a !important;
+  color: #eeeeee !important;
+}
+
+html.dark-mode .modal .cancelar {
+  background-color: #35383a !important;
+  color: #eeeeee !important;
+}
+
+html.dark-mode .modal .pdf {
+  background-color: #90caf9 !important;
+  color: #18344a !important;
+}
+
+html.dark-mode .modal .header .icon {
+  background-color: #3a3025 !important;
+  color: #ffb74d !important;
+}
+
+html.dark-mode .modal .vazio h3 {
+  color: #eeeeee !important;
+}
+
+html.dark-mode .modal .vazio p {
+  color: #999999 !important;
+}
+
+html.dark-mode .btn-compras {
+  background-color: #2b2e30 !important;
+  border-color: #45494c !important;
+  color: #eeeeee !important;
+}
+
+html.dark-mode .btn-compras:hover {
+  background-color: #35383a !important;
+}
