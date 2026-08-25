@@ -1,3 +1,77 @@
+<template>
+  <div class="employee-card">
+
+    <div class="card-header">
+
+      <div class="employee-photo">
+        <img
+          v-if="fotoUrl"
+          :src="fotoUrl"
+          :alt="funcionario.nome"
+        />
+
+        <span
+          v-else
+          class="material-symbols-outlined"
+        >
+          person
+        </span>
+      </div>
+
+      <div class="employee-title">
+        <h3>{{ funcionario.nome }}</h3>
+        <span>{{ funcionario.cargo }}</span>
+      </div>
+
+    </div>
+
+    <div class="info-block">
+      <small>Telefone</small>
+
+      <span>
+        {{ funcionario.telefone || 'Não informado' }}
+      </span>
+    </div>
+
+    <div class="info-block">
+      <small>Pagamento</small>
+
+      <strong>
+        {{ formatarPagamento(funcionario.pagamento) }}
+      </strong>
+    </div>
+
+    <div class="card-actions">
+
+      <button
+        class="edit-button"
+        type="button"
+        @click="$emit('editar', funcionario)"
+      >
+        <span class="material-symbols-outlined">
+          edit
+        </span>
+
+        Editar
+      </button>
+
+      <button
+        class="delete-button"
+        type="button"
+        @click="$emit('excluir', funcionario.id)"
+      >
+        <span class="material-symbols-outlined">
+          delete
+        </span>
+
+        Excluir
+      </button>
+
+    </div>
+
+  </div>
+</template>
+
 <script>
 export default {
   props: {
@@ -8,189 +82,165 @@ export default {
   },
 
   computed: {
-    fotoFuncionario() {
-      if (!this.funcionario.foto) return null;
+    fotoUrl() {
+      if (!this.funcionario.foto?.url) {
+        return ''
+      }
 
-      let url = this.funcionario.foto.url;
-
-      if (!url) return null;
-
-      // Corrige URLs que vêm como localhost
-      return url.replace(
-        "http://127.0.0.1:8000",
+      return this.funcionario.foto.url.replace(
+        'http://127.0.0.1:8000',
         import.meta.env.VITE_API_URL
-      );
+      )
+    }
+  },
+
+  methods: {
+    formatarPagamento(valor) {
+      if (
+        valor === null ||
+        valor === undefined ||
+        valor === ''
+      ) {
+        return 'Não informado'
+      }
+
+      return Number(valor).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      })
     }
   }
 }
 </script>
 
-<template>
-  <div class="card">
-
-    <div class="imagem">
-
-      <img
-        v-if="fotoFuncionario"
-        :src="fotoFuncionario"
-        :alt="funcionario.nome"
-      />
-
-      <div
-        v-else
-        class="sem-foto"
-      >
-        <font-awesome-icon icon="fa-solid fa-user" />
-      </div>
-
-    </div>
-
-    <div class="conteudo">
-
-      <h3>{{ funcionario.nome }}</h3>
-
-      <p>
-        <strong>Cargo</strong><br>
-        {{ funcionario.cargo }}
-      </p>
-
-      <p>
-        <strong>Telefone</strong><br>
-        {{ funcionario.telefone }}
-      </p>
-
-      <p>
-        <strong>Pagamento</strong><br>
-        R$ {{ Number(funcionario.pagamento).toFixed(2) }}
-      </p>
-
-      <div class="acoes">
-
-        <button
-          class="editar"
-          @click="$emit('editar', funcionario)"
-        >
-          <font-awesome-icon icon="fa-solid fa-pen" />
-        </button>
-
-        <button
-          class="excluir"
-          @click="$emit('excluir', funcionario.id)"
-        >
-          <font-awesome-icon icon="fa-solid fa-trash" />
-        </button>
-
-      </div>
-
-    </div>
-
-  </div>
-</template>
-
 <style scoped>
-
-.card{
-    background:#fff;
-    border-radius:18px;
-    overflow:hidden;
-    box-shadow:0 8px 22px rgba(0,0,0,.12);
-    transition:.25s;
-    display:flex;
-    flex-direction:column;
+.employee-card {
+  background-color: #ffffff;
+  padding: 18px;
+  border-radius: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.card:hover{
-    transform:translateY(-5px);
-    box-shadow:0 12px 30px rgba(0,0,0,.18);
+.employee-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.08);
 }
 
-.imagem{
-    width:100%;
-    height:220px;
-    background:#f4f4f4;
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 15px;
 }
 
-.imagem img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
+.employee-photo {
+  width: 58px;
+  height: 58px;
+  min-width: 58px;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #e3f2fd;
+  color: #90caf9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.sem-foto{
-    width:100%;
-    height:100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:70px;
-    color:#c8c8c8;
+.employee-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.conteudo{
-    padding:20px;
-    display:flex;
-    flex-direction:column;
-    gap:12px;
+.employee-photo .material-symbols-outlined {
+  font-size: 30px;
 }
 
-.conteudo h3{
-    margin:0;
-    color:#FF9500;
-    font-family:'Unbounded';
-    font-size:1.25rem;
+.employee-title {
+  min-width: 0;
 }
 
-.conteudo p{
-    margin:0;
-    color:#555;
-    font-family:'Urbanist';
-    line-height:1.5;
+.employee-title h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
-.acoes{
-    margin-top:18px;
-    display:flex;
-    justify-content:flex-end;
-    gap:12px;
+.employee-title span {
+  display: block;
+  margin-top: 3px;
+  color: #888;
+  font-size: 0.75rem;
 }
 
-.acoes button{
-    width:42px;
-    height:42px;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
-    transition:.2s;
-    color:white;
-    font-size:16px;
+.info-block {
+  background-color: #f9f9f9;
+  padding: 9px 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
 }
 
-.editar{
-    background:#FF9500;
+.info-block small {
+  display: block;
+  margin-bottom: 3px;
+  color: #888;
+  font-size: 10px;
 }
 
-.editar:hover{
-    background:#e98900;
+.info-block span,
+.info-block strong {
+  color: #333;
+  font-size: 0.82rem;
 }
 
-.excluir{
-    background:#e74c3c;
+.card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
 }
 
-.excluir:hover{
-    background:#c0392b;
+.edit-button,
+.delete-button {
+  flex: 1;
+  min-height: 40px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: 0.2s;
 }
 
-@media(max-width:700px){
-
-.card{
-    width:100%;
+.edit-button {
+  background-color: #e3f2fd;
+  color: #1976d2;
 }
 
-.imagem{
-    height:190px;
+.edit-button:hover {
+  background-color: #bbdefb;
 }
 
+.delete-button {
+  background-color: #ffebee;
+  color: #c62828;
 }
 
+.delete-button:hover {
+  background-color: #ffcdd2;
+}
+
+.edit-button .material-symbols-outlined,
+.delete-button .material-symbols-outlined {
+  font-size: 17px;
+}
 </style>

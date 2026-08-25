@@ -1,712 +1,563 @@
-<script setup>
-import { computed } from "vue";
-import { useRouter } from "vue-router";
-
-
-const router = useRouter();
-
-const dataHoje = computed(() => {
-  return new Date().toLocaleDateString("pt-BR", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-});
-
-const irCalendario = () => router.push("/calendario");
-const irEstoque = () => router.push("/estoque");
-const irCardapio = () => router.push("/cardapio");
-const irFuncionarios = () => router.push("/funcionarios");
-const irOrcamento = () => router.push("/orcamento");
-const irConfig = () => router.push("/config");
-</script>
-
 <template>
-  <div class="pagina-home">
+  <div class="page-layout">
+    <div class="main-content">
 
-    <!-- Boas Vindas -->
-    <section class="banner">
-      <div>
-        <h1>
-          Bem-vindo!
-        </h1>
-        <p>{{ dataHoje }}</p>
-      </div>
+      <Header />
 
-      <div class="icone-banner">
-        🔥
-      </div>
-    </section>
+      <div class="page-body">
 
-    <!-- Estatísticas -->
-    <section class="cards-estatisticas">
-
-      <div class="card-estatistica">
-        <span class="icone">📅</span>
-        <h2>6</h2>
-        <p>Eventos este mês</p>
-      </div>
-
-      <div class="card-estatistica">
-        <span class="icone">📦</span>
-        <h2>32</h2>
-        <p>Itens em estoque</p>
-      </div>
-
-      <div class="card-estatistica">
-        <span class="icone">👨‍🍳</span>
-        <h2>12</h2>
-        <p>Funcionários</p>
-      </div>
-
-      <div class="card-estatistica">
-        <span class="icone">💰</span>
-        <h2>R$ 8.450</h2>
-        <p>Saldo do mês</p>
-      </div>
-
-    </section>
-
-    <!-- Conteúdo -->
-    <section class="grid-home">
-
-      <div class="card">
-        <div class="titulo">
-          <h2>📅 Próximos Eventos</h2>
-          <button @click="irCalendario">Ver todos</button>
+        <!-- Banner Dinâmico com dados do Usuário e Data Atual -->
+        <div class="welcome-banner">
+          <h2>Bem vindo novamente, {{ authStore.usuario?.name || 'Usuário' }}</h2>
+          <p>{{ dataFormatada }}</p>
         </div>
 
-        <ul>
-          <li>Reunião Geral — 12/07</li>
-          <li>Treinamento — 15/07</li>
-          <li>Festa Julina — 20/07</li>
-        </ul>
-      </div>
+        <!-- 4 Cards de Métricas -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-icon">📅</div>
+            <div class="metric-value orange-text">{{ appStore.eventos.length }}</div>
+            <div class="metric-label">Eventos esse mês</div>
+          </div>
 
-      <div class="card">
-        <div class="titulo">
-          <h2>📦 Estoque Baixo</h2>
-          <button @click="irEstoque">Ver estoque</button>
+          <div class="metric-card">
+            <div class="metric-icon">📦</div>
+            <div class="metric-value orange-text">32</div>
+            <div class="metric-label">Itens em estoque</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon">👥</div>
+            <div class="metric-value orange-text">12</div>
+            <div class="metric-label">Funcionários</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon">💰</div>
+            <div class="metric-value orange-text">R$ 8.450</div>
+            <div class="metric-label">Saldo do mês</div>
+          </div>
         </div>
 
-        <ul>
-          <li>Arroz — 2 unidades</li>
-          <li>Óleo — 1 unidade</li>
-          <li>Feijão — 3 unidades</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <div class="titulo">
-          <h2>🍽 Cardápio de Hoje</h2>
-          <button @click="irCardapio">Abrir</button>
+        <!-- Seção de Pedidos Disponíveis -->
+        <div class="section-header">
+          <h3>Pedidos disponíveis</h3>
+          <div class="actions">
+            <button class="btn-orange" @click="$router.push('/pedidos')">Ver todos</button>
+            <button class="btn-filter">Filtrar ∧</button>
+          </div>
         </div>
 
-        <ul>
-          <li>Arroz Branco</li>
-          <li>Feijão Preto</li>
-          <li>Frango Grelhado</li>
-          <li>Salada Verde</li>
-        </ul>
-      </div>
+        <!-- Grid de Cards de Pedidos sem cor pastel -->
+        <div class="pedidos-grid">
+          <div v-for="pedido in appStore.pedidos" :key="pedido.id" class="pedido-card">
 
-      <div class="card">
-        <div class="titulo">
-          <h2>💰 Financeiro</h2>
-          <button @click="irOrcamento">Detalhes</button>
-        </div>
+            <div class="client-header">
+              <img :src="pedido.fotoCliente" class="client-avatar" alt="Avatar Cliente" />
+              <div>
+                <strong>{{ pedido.cliente }}</strong>
+                <small>{{ pedido.dataPedido }}</small>
+              </div>
+            </div>
 
-        <ul>
-          <li>Receitas: R$ 12.500</li>
-          <li>Despesas: R$ 4.050</li>
-          <li>Saldo: R$ 8.450</li>
-        </ul>
-      </div>
+            <div class="info-box full">
+              <small>$ Valor do orçamento</small>
+              <strong>{{ pedido.orcamento }}</strong>
+            </div>
 
-      <div class="card grande">
-        <div class="titulo">
-          <h2>👨‍🍳 Funcionários</h2>
-          <button @click="irFuncionarios">Gerenciar</button>
-        </div>
+            <div class="info-row">
+              <div class="info-box">
+                <small>✓ Tipo</small>
+                <span>{{ pedido.tipo }}</span>
+              </div>
+              <div class="info-box">
+                <small>🕒 Data e hora</small>
+                <span>{{ pedido.dataHora }}</span>
+              </div>
+            </div>
 
-        <p>Total cadastrados: <strong>12</strong></p>
-        <p>2 aniversários este mês.</p>
-        <p>1 funcionário em férias.</p>
-      </div>
+            <div class="info-row">
+              <div class="info-box">
+                <small>👥 Número de pessoas</small>
+                <span>{{ pedido.pessoas }}</span>
+              </div>
+              <div class="info-box">
+                <small>📍 Endereço</small>
+                <span>{{ pedido.endereco }}</span>
+              </div>
+            </div>
 
-      <div class="card grande">
-        <div class="titulo">
-          <h2>⚡ Ações Rápidas</h2>
-        </div>
+            <button class="btn-acessar" @click="$router.push('/pedidos')">
+              Acessar Pedido ➔
+            </button>
 
-        <div class="acoes">
-
-          <button @click="irCalendario">
-            📅 Novo Evento
-          </button>
-
-          <button @click="irEstoque">
-            📦 Novo Produto
-          </button>
-
-          <button @click="irFuncionarios">
-            👨‍🍳 Novo Funcionário
-          </button>
-
-          <button @click="irConfig">
-            ⚙ Configurações
-          </button>
-
+          </div>
         </div>
 
       </div>
-
-    </section>
-
+    </div>
   </div>
 </template>
-<style>
-/* ===========================
-   HOME - MOBILE FIRST
-=========================== */
 
-* {
-  box-sizing: border-box;
+<script setup>
+import { computed } from 'vue';
+import { useAppStore } from '@/stores/appStore.js';
+import { useAuthStore } from "@/stores/auth.js";
+import Header from '@/components/Header.vue';
+
+const appStore = useAppStore();
+const authStore = useAuthStore();
+
+// Formata a data atual em português (ex: quinta-feira, 16 de julho de 2026)
+const dataFormatada = computed(() => {
+  const opcoes = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+  return new Date().toLocaleDateString('pt-BR', opcoes);
+});
+</script>
+<style scoped>
+.page-layout {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+  background-color: #f4f5f7;
+  font-family: 'Poppins', sans-serif;
+  color: #333;
+  overflow-x: hidden;
 }
 
-.pagina-home {
+.main-content {
+  flex: 1;
   width: 100%;
-  min-height: 100%;
-  padding: 1rem;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  font-family: "Poppins", sans-serif;
+  overflow-x: hidden;
 }
 
-/* ===========================
-   BANNER
-=========================== */
-
-.banner {
+.page-body {
   width: 100%;
-  border-radius: 22px;
-  background: linear-gradient(135deg, #ff9800, #ff6d00);
-  color: white;
-  padding: 1.4rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 12px 30px rgba(255, 136, 0, .25);
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 16px 14px 35px;
 }
 
-.banner h1 {
+/* ================= BANNER ================= */
+
+.welcome-banner {
+  width: 100%;
+  min-width: 0;
+  min-height: 130px;
+  box-sizing: border-box;
+  padding: 20px;
+  margin-bottom: 18px;
+  border-radius: 15px;
+  background: #c2c5c8;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.welcome-banner h2 {
   margin: 0;
-  font-size: 1.35rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.4;
+  overflow-wrap: break-word;
+}
+
+.welcome-banner p {
+  margin: 6px 0 0;
+  font-size: 0.75rem;
+  opacity: 0.9;
+  text-transform: capitalize;
+}
+
+/* ================= MÉTRICAS ================= */
+
+.metrics-grid {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.metric-card {
+  min-width: 0;
+  box-sizing: border-box;
+  background-color: #fff;
+  padding: 16px;
+  border-radius: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.metric-icon {
+  width: 36px;
+  height: 36px;
+  margin-bottom: 9px;
+  border-radius: 10px;
+  background-color: #fff3e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.metric-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ff8a00;
+  line-height: 1.2;
+  overflow-wrap: break-word;
+}
+
+.metric-label {
+  margin-top: 5px;
+  color: #888;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+/* ================= PEDIDOS HEADER ================= */
+
+.section-header {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.section-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1rem;
   font-weight: 700;
 }
 
-.banner p {
-  margin-top: .45rem;
-  font-size: .8rem;
-  opacity: .9;
+.actions {
+  width: 100%;
+  display: flex;
+  gap: 8px;
 }
 
-.icone-banner {
-  font-size: 3rem;
+.btn-orange,
+.btn-filter {
+  flex: 1;
+  min-width: 0;
+  min-height: 36px;
+  box-sizing: border-box;
+  border-radius: 9px;
+  padding: 7px 10px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
 }
 
-.cards-estatisticas {
+.btn-orange {
+  border: none;
+  background-color: #ff8a00;
+  color: #fff;
+}
+
+.btn-orange:hover {
+  background-color: #e87d00;
+}
+
+.btn-filter {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  color: #666;
+}
+
+.btn-filter:hover {
+  background-color: #f8f8f8;
+}
+
+/* ================= GRID PEDIDOS ================= */
+
+.pedidos-grid {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: .9rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
 }
 
-.card-estatistica {
-
-  background: white;
-
-  border-radius: 18px;
-
-  padding: 1rem;
-
-  box-shadow: 0 4px 18px rgba(0, 0, 0, .06);
-
-  transition: .25s;
+.pedido-card {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
 }
 
-.card-estatistica:active {
-  transform: scale(.98);
+.pedido-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.card-estatistica .icone {
+/* ================= CLIENTE ================= */
 
-  font-size: 1.6rem;
-
-}
-
-.card-estatistica h2 {
-
-  margin: .7rem 0 .25rem;
-
-  color: #ff7a00;
-
-  font-size: 1.5rem;
-
-}
-
-.card-estatistica p {
-
-  margin: 0;
-
-  color: #777;
-
-  font-size: .8rem;
-
-}
-
-.grid-home {
-
+.client-header {
+  min-width: 0;
   display: flex;
-
-  flex-direction: column;
-
-  gap: 1rem;
-
-}
-
-.card {
-
-  background: white;
-
-  border-radius: 20px;
-
-  padding: 1.2rem;
-
-  box-shadow: 0 4px 18px rgba(0, 0, 0, .06);
-
-  transition: .25s;
-
-}
-
-.card:active {
-
-  transform: scale(.99);
-
-}
-
-.titulo {
-
-  display: flex;
-
-  justify-content: space-between;
-
   align-items: center;
-
-  gap: .5rem;
-
-  margin-bottom: 1rem;
-
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
-.titulo h2 {
+.client-avatar {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #f1f1f1;
+}
 
-  margin: 0;
+.client-header > div {
+  min-width: 0;
+}
 
-  font-size: 1rem;
-
+.client-header strong {
+  display: block;
   color: #333;
-
-}
-
-.titulo button {
-
-  background: #ff9800;
-
-  color: white;
-
-  border: none;
-
-  border-radius: 10px;
-
-  padding: .55rem .9rem;
-
-  font-size: .75rem;
-
+  font-size: 0.85rem;
   font-weight: 600;
-
-  cursor: pointer;
-
-  transition: .25s;
-
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.titulo button:active {
-
-  transform: scale(.95);
-
+.client-header small {
+  display: block;
+  margin-top: 2px;
+  color: #999;
+  font-size: 0.68rem;
 }
 
-.card ul {
+/* ================= INFORMAÇÕES ================= */
 
-  margin: 0;
+.info-box {
+  flex: 1;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 9px 10px;
+  border-radius: 9px;
+  background-color: #f9f9f9;
+  overflow: hidden;
+}
 
-  padding-left: 18px;
+.info-box.full {
+  width: 100%;
+  margin-bottom: 8px;
+}
 
+.info-box small {
+  display: block;
+  margin-bottom: 3px;
+  color: #999;
+  font-size: 0.63rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.info-box span,
+.info-box strong {
+  display: block;
+  color: #333;
+  font-size: 0.74rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.info-row {
+  width: 100%;
+  min-width: 0;
   display: flex;
-
-  flex-direction: column;
-
-  gap: .7rem;
-
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
-.card li {
+/* ================= BOTÃO ACESSAR ================= */
 
-  font-size: .9rem;
-
-  color: #666;
-
-}
-
-.card p {
-
-  margin: .45rem 0;
-
-  font-size: .9rem;
-
-  color: #666;
-
-  line-height: 1.5;
-
-}
-
-/* ===========================
-   AÇÕES
-=========================== */
-
-.acoes {
-
-  display: grid;
-
-  grid-template-columns: 1fr;
-
-  gap: .8rem;
-
-  margin-top: .5rem;
-
-}
-
-.acoes button {
-
-  background: #fff5e8;
-
+.btn-acessar {
+  width: 100%;
+  min-height: 38px;
+  box-sizing: border-box;
+  margin-top: 5px;
+  padding: 9px 12px;
   border: none;
-
-  border-radius: 16px;
-
-  padding: 1rem;
-
-  font-size: .9rem;
-
+  border-radius: 9px;
+  background-color: #ff8a00;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.75rem;
   font-weight: 600;
-
-  color: #ff7a00;
-
   cursor: pointer;
-
-  transition: .25s;
-
+  transition: 0.2s ease;
 }
 
-.acoes button:active {
-
-  transform: scale(.98);
-
-  background: #ff9800;
-
-  color: white;
-
+.btn-acessar:hover {
+  background-color: #e87d00;
 }
 
-/* ==========================================
-   TABLET
-========================================== */
+/* ================= TEMA ESCURO ================= */
+
+:global(html.dark-mode) .page-layout {
+  background-color: #181a1b;
+}
+
+:global(html.dark-mode) .metric-card,
+:global(html.dark-mode) .pedido-card {
+  background-color: #222526;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+:global(html.dark-mode) .metric-label,
+:global(html.dark-mode) .section-header h3,
+:global(html.dark-mode) .client-header strong {
+  color: #eeeeee;
+}
+
+:global(html.dark-mode) .btn-filter {
+  background-color: #2b2e30;
+  border-color: #45494c;
+  color: #eeeeee;
+}
+
+:global(html.dark-mode) .info-box {
+  background-color: #2b2e30;
+}
+
+:global(html.dark-mode) .info-box span,
+:global(html.dark-mode) .info-box strong {
+  color: #eeeeee;
+}
+
+/* ================= TABLET ================= */
+
+@media (min-width: 600px) {
+  .page-body {
+    padding: 25px 30px 40px;
+  }
+
+  .welcome-banner {
+    min-height: 145px;
+    padding: 25px;
+  }
+
+  .welcome-banner h2 {
+    font-size: 1.3rem;
+  }
+
+  .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+  }
+
+  .section-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .actions {
+    width: auto;
+  }
+
+  .btn-orange,
+  .btn-filter {
+    flex: none;
+    min-width: 90px;
+  }
+
+  .pedidos-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+}
+
+/* ================= DESKTOP ================= */
 
 @media (min-width: 768px) {
-
-  .pagina-home {
-    padding: 2rem;
-    gap: 1.5rem;
+  .page-body {
+    padding: 30px;
   }
 
-  .banner {
-    padding: 2rem;
-    min-height: 180px;
+  .welcome-banner {
+    min-height: 155px;
+    padding: 28px;
   }
 
-  .banner h1 {
-    font-size: 2rem;
+  .welcome-banner h2 {
+    font-size: 1.45rem;
   }
 
-  .banner p {
-    font-size: .95rem;
+  .welcome-banner p {
+    font-size: 0.82rem;
   }
 
-  .icone-banner {
-    font-size: 4.5rem;
+  .metric-card {
+    padding: 20px;
   }
 
-  /* Estatísticas */
-
-  .cards-estatisticas {
-
-    grid-template-columns: repeat(4, 1fr);
-
-    gap: 1rem;
-
+  .metric-value {
+    font-size: 1.6rem;
   }
 
-  .card-estatistica {
-
-    padding: 1.4rem;
-
+  .pedidos-grid {
+    gap: 20px;
   }
-
-  .card-estatistica .icone {
-
-    font-size: 2rem;
-
-  }
-
-  .card-estatistica h2 {
-
-    font-size: 2rem;
-
-  }
-
-  .card-estatistica p {
-
-    font-size: .9rem;
-
-  }
-
-  /* Conteúdo */
-
-  .grid-home {
-
-    display: grid;
-
-    grid-template-columns: repeat(2, 1fr);
-
-    gap: 1.3rem;
-
-  }
-
-  .card {
-
-    padding: 1.5rem;
-
-  }
-
-  .card.grande {
-
-    grid-column: span 2;
-
-  }
-
-  .titulo h2 {
-
-    font-size: 1.15rem;
-
-  }
-
-  .titulo button {
-
-    font-size: .85rem;
-
-    padding: .65rem 1rem;
-
-  }
-
-  .card li {
-
-    font-size: .95rem;
-
-  }
-
-  .card p {
-
-    font-size: .95rem;
-
-  }
-
-  .acoes {
-
-    grid-template-columns: repeat(2, 1fr);
-
-    gap: 1rem;
-
-  }
-
 }
 
-/* ==========================================
-   DESKTOP
-========================================== */
+/* ================= DESKTOP GRANDE ================= */
 
-@media (min-width: 1200px) {
-
-  .pagina-home {
-
-    max-width: 1400px;
-
-    margin: auto;
-
-    padding: 2.5rem;
-
+@media (min-width: 1024px) {
+  .page-body {
+    padding: 30px 40px;
   }
 
-  .banner {
-
-    padding: 2.5rem 3rem;
-
-    border-radius: 28px;
-
+  .metrics-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
   }
 
-  .banner h1 {
-
-    font-size: 2.4rem;
-
+  .pedidos-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
   }
 
-  .banner p {
-
-    font-size: 1rem;
-
+  .welcome-banner {
+    min-height: 150px;
   }
 
-  .icone-banner {
-
-    font-size: 5.5rem;
-
+  .welcome-banner h2 {
+    font-size: 1.6rem;
   }
-
-  .cards-estatisticas {
-
-    gap: 1.5rem;
-
-  }
-
-  .card-estatistica {
-
-    border-radius: 22px;
-
-    padding: 2rem;
-
-  }
-
-  .card-estatistica:hover {
-
-    transform: translateY(-6px);
-
-    box-shadow: 0 12px 30px rgba(0, 0, 0, .08);
-
-  }
-
-  .grid-home {
-
-    gap: 1.5rem;
-
-  }
-
-  .card {
-
-    border-radius: 22px;
-
-    padding: 2rem;
-
-  }
-
-  .card:hover {
-
-    transform: translateY(-5px);
-
-    box-shadow: 0 14px 35px rgba(0, 0, 0, .08);
-
-  }
-
-  .titulo {
-
-    margin-bottom: 1.5rem;
-
-  }
-
-  .titulo h2 {
-
-    font-size: 1.3rem;
-
-  }
-
-  .titulo button {
-
-    padding: .75rem 1.2rem;
-
-    font-size: .9rem;
-
-  }
-
-  .acoes button {
-
-    padding: 1.2rem;
-
-    font-size: 1rem;
-
-  }
-
-  .acoes button:hover {
-
-    background: #ff9800;
-
-    color: white;
-
-    transform: translateY(-3px);
-
-  }
-
-}
-
-/* ==========================================
-   ANIMAÇÕES
-========================================== */
-
-.banner,
-.card,
-.card-estatistica {
-
-  animation: fadeUp .45s ease;
-
-}
-
-@keyframes fadeUp {
-
-  from {
-
-    opacity: 0;
-
-    transform: translateY(20px);
-
-  }
-
-  to {
-
-    opacity: 1;
-
-    transform: translateY(0);
-
-  }
-
 }
 </style>

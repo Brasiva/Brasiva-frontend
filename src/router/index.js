@@ -1,20 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import AuthLayout from '../layouts/AuthLayout.vue'
 import DashboardLayout from '../layouts/DashboardLayout.vue'
 
 // Views do sistema
 import Home from '../views/HomeView.vue'
-import Calendar from '../views/CalendarView.vue'
+import Calendar from '../views/CalendarioView.vue'
+import Eventos from '../views/EventosView.vue'
+import Pedidos from '../views/PedidosView.vue'
 import Menu from '../views/MenuView.vue'
 import Stock from '../views/StockView.vue'
 import Employee from '../views/EmployeeView.vue'
 import Budget from '../views/BudgetView.vue'
-import ConfigView from '../views/ConfigView.vue'
+import Perfil from '../views/PerfilView.vue'
+import Config from '../views/ConfigView.vue'
 
-// Views de autenticação
-import Login from '../views/LoginView.vue'
-import Register from '../views/RegisterView.vue'
 
 // Views da página inicial
 import PaginaInicial from '../views/cadastro/PaginaInicialView.vue'
@@ -57,6 +56,14 @@ const routes = [
         component: Calendar
       },
       {
+        path: 'eventos',
+        component: Eventos
+      },
+      {
+        path: 'pedidos',
+        component: Pedidos
+      },
+      {
         path: 'cardapio',
         component: Menu
       },
@@ -73,8 +80,12 @@ const routes = [
         component: Budget
       },
       {
-        path: 'config',
-        component: ConfigView
+        path: 'perfil',
+        component: Perfil
+      },
+      {
+        path: 'configuracoes',
+        component: Config
       }
     ]
   }

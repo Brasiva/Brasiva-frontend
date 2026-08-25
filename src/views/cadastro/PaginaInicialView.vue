@@ -15,17 +15,18 @@ const irLogin = () => {
 
 <template>
   <div class="pagina">
-    <div class="bg-imagem"></div>
+    <!-- Efeito de iluminação desfocada (Glow Laranja) -->
+    <div class="orange-glow"></div>
 
     <div class="conteudo">
-      <h1>BRASIVA</h1>
+      <h1 class="logo">BRASIVA</h1>
 
       <div class="botoes">
-        <button class="botao" @click="irLogin">
+        <button class="botao botao-primario" @click="irLogin">
           FAZER LOGIN
         </button>
-        
-        <button class="botao" @click="irCadastro">
+
+        <button class="botao botao-secundario" @click="irCadastro">
           CADASTRAR-SE
         </button>
       </div>
@@ -47,50 +48,47 @@ const irLogin = () => {
   justify-content: center;
   align-items: center;
   position: relative;
-  overflow: hidden; /* Evita barras de rolagem ao rotacionar o fundo no desktop */
-
-  color: white;
+  overflow: hidden;
+  background-color: #161316;
+  color: #FFFFFF;
   font-family: "Poppins", sans-serif;
-  padding: 2rem;
+  padding: 2rem 1.5rem;
   box-sizing: border-box;
 }
 
-/* Elemento do Background */
-.bg-imagem {
+.orange-glow {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: -80px;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(255, 109, 41, 0.4) 0%, rgba(22, 19, 22, 0) 70%);
+  filter: blur(50px);
+  pointer-events: none;
   z-index: 1;
-  /* Imagem em pé (vertical) padrão para Mobile */
-  background: url("@/assets/background-image.png") center center / cover no-repeat;
-  transition: transform 0.3s ease;
 }
 
 .conteudo {
   position: relative;
-  z-index: 2; /* Fica por cima do fundo */
+  z-index: 2;
   width: 100%;
-  max-width: 320px;
+  max-width: 380px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2.5rem;
+  gap: 3rem;
 }
 
-.conteudo h1 {
+.logo {
   font-family: "Imbue", serif;
-  font-optical-sizing: auto;
   font-weight: 300;
-  font-style: normal;
-  font-size: 4rem;
+  font-size: 4.5rem;
   line-height: 1;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
   text-align: center;
-  margin: 0 0 8vw 0;
+  color: #FFFFFF;
+  margin: 0;
+  text-shadow: 0 0 20px rgba(255, 109, 41, 0.3);
 }
-
 
 .botoes {
   width: 100%;
@@ -102,76 +100,64 @@ const irLogin = () => {
 
 .botao {
   width: 100%;
-  max-width: 260px;
-  height: 30px;
-
-  border: none;
-  border-radius: 999px;
-
-  background: #FF9500;
-  color: white;
-
+  height: 48px;
+  border-radius: 12px;
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.5px;
-
   cursor: pointer;
-  transition: transform 0.2s, background 0.2s;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  box-sizing: border-box;
+}
+
+.botao-primario {
+  border: none;
+  background: linear-gradient(90deg, #FF6D29 0%, #453027 100%);
+  color: #FFFFFF;
+}
+
+.botao-secundario {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 109, 41, 0.4);
+  color: #FFFFFF;
 }
 
 .botao:hover {
-  background: #ffa826;
-  transform: scale(1.02);
+  transform: translateY(-2px);
+  filter: brightness(1.1);
 }
 
 .botao:active {
-  transform: scale(0.98);
+  transform: translateY(0);
 }
 
-/* Container do botão de instalar no Mobile */
 .container-instalar {
   position: absolute;
-  bottom: 2.5rem;
+  bottom: 2rem;
   width: 100%;
   display: flex;
   justify-content: center;
   z-index: 2;
 }
 
-/* DESKTOP (Telas maiores) */
+/* DESKTOP RESPONSIVO */
 @media (min-width: 768px) {
-  .pagina {
-    justify-content: center;
-    align-items: center;
-  }
-
-  .bg-imagem {
-    width: 100vh;  /* Inverte proporções para cobrir tudo após girar */
-    height: 100vw;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(-90deg); /* Rotaciona a imagem em pé para ficar deitada */
-    transform-origin: center;
+  .orange-glow {
+    width: 600px;
+    height: 600px;
+    top: -150px;
   }
 
   .conteudo {
-    max-width: 450px;
-    gap: 3.5rem;
+    max-width: 420px;
+    gap: 4rem;
   }
 
-  .conteudo h1 {
+  .logo {
     font-size: 6.5rem;
-    margin: 0;
-  }
-
-  .botao {
-    max-width: 250px;
-    height: 40px;
-    font-size: 1rem;
   }
 
   .container-instalar {
-    position: absolute;
     bottom: 2.5rem;
     right: 4rem;
     width: auto;
