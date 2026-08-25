@@ -62,6 +62,8 @@ html.dark-mode .sidebar {
 }
 
 html.dark-mode .sidebar a,
+html.dark-mode .mobile-sidebar,
+html.dark-mode .mobile-sidebar-header,
 html.dark-mode .sidebar button,
 html.dark-mode .sidebar span,
 html.dark-mode .sidebar p,
@@ -252,6 +254,7 @@ html.dark-mode .sidebar-menu a.router-link-active,
 html.dark-mode .toggle-sidebar,
 html.dark-mode .menu-item:hover:not(.router-link-active),
 html.dark-mode .footer-item:hover,
+html.dark-mode .sidebar .router-link-active,
 html.dark-mode .sidebar-menu a.router-link-exact-active,
 html.dark-mode .sidebar-menu button.active,
 html.dark-mode .sidebar-menu li.active {
@@ -299,4 +302,267 @@ html.dark-mode button:has(span:contains("Filtrar")) {
   background-color: #2b2e30 !important;
   color: #FFFFFF !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+/* ============================= */
+/* SIDEBAR MOBILE - TEMA ESCURO */
+/* ============================= */
+
+html.dark-mode .mobile-nav {
+  background-color: #202324 !important;
+  border: 1px solid #303436 !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+html.dark-mode .mobile-item {
+  color: #9ca3af !important;
+  background-color: transparent !important;
+}
+
+html.dark-mode .mobile-item:hover {
+  background-color: #2b2e30 !important;
+  color: #eeeeee !important;
+}
+
+/* Item selecionado */
+html.dark-mode .mobile-nav .router-link-active {
+  background-color: #ff9500 !important;
+  color: #ffffff !important;
+}
+
+/* Botão menu */
+html.dark-mode .mobile-menu-button {
+  color: #9ca3af !important;
+  background-color: transparent !important;
+}
+
+/* Fundo atrás do menu */
+html.dark-mode .mobile-overlay {
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Menu lateral mobile */
+html.dark-mode .mobile-sidebar {
+  background-color: #202324 !important;
+  color: #eeeeee !important;
+  box-shadow: -5px 0 25px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Cabeçalho */
+html.dark-mode .mobile-sidebar-header {
+  background-color: #202324 !important;
+  border-bottom-color: #383b3d !important;
+}
+
+html.dark-mode .mobile-sidebar-header h2 {
+  color: #eeeeee !important;
+}
+
+html.dark-mode .mobile-sidebar-header p {
+  color: #999999 !important;
+}
+
+/* Botão fechar */
+html.dark-mode .close-mobile-menu {
+  background-color: #2b2e30 !important;
+  color: #eeeeee !important;
+}
+
+html.dark-mode .close-mobile-menu:hover {
+  background-color: #35383a !important;
+}
+
+/* Itens do menu */
+html.dark-mode .mobile-sidebar-item {
+  background-color: transparent !important;
+  color: #9ca3af !important;
+}
+
+html.dark-mode .mobile-sidebar-item:hover {
+  background-color: #2b2e30 !important;
+  color: #eeeeee !important;
+}
+
+/* Item ativo */
+html.dark-mode .mobile-sidebar-item.router-link-active {
+  background-color: rgba(255, 149, 0, 0.15) !important;
+  color: #ff9500 !important;
+  border-left-color: #ff9500 !important;
+}
+
+/* Ícones */
+html.dark-mode .mobile-sidebar-item .material-symbols-outlined {
+  color: inherit !important;
+}
+
+/* Rodapé */
+html.dark-mode .mobile-sidebar-footer {
+  background-color: #202324 !important;
+  border-top-color: #383b3d !important;
+}
+
+/* Logout */
+html.dark-mode .logout-mobile {
+  color: #ef5350 !important;
+}
+
+html.dark-mode .logout-mobile:hover {
+  background-color: rgba(239, 83, 80, 0.12) !important;
+  color: #ef5350 !important;
+}
+html.dark-mode .calendar-container{background:#222526!important;color:#eee!important}
+html.dark-mode .calendar-header h2{color:#eee!important}
+html.dark-mode .year-label,.dark-mode .weekdays-grid span{color:#999!important}
+html.dark-mode .day-cell{background:#2b2e30!important;border-color:#3b3f41!important}
+html.dark-mode .day-cell:hover{background:#35383a!important}
+html.dark-mode .day-cell.vazio{background:transparent!important;border-color:transparent!important}
+html.dark-mode .day-cell.today{background:#3a2d20!important;border-color:#ff9500!important}
+html.dark-mode .day-number{color:#eee!important}
+html.dark-mode .today .day-number{background:#ff9500!important;color:#fff!important}
+html.dark-mode .legend-box{background:#2b2e30!important}
+html.dark-mode .legend-box h4,.dark-mode .legend-items{color:#bbb!important}
+html.dark-mode .calendar-actions button:first-child{background:#2b2e30!important;color:#eee!important;border-color:#45494c!important}
+html.dark-mode .modal-content{background:#222526!important;color:#eee!important}
+html.dark-mode .modal-content h3{color:#eee!important}
+html.dark-mode .close-btn{background:#35383a!important;color:#eee!important}
+
+/* ================= ESTOQUE - DARK MODE ================= */
+
+html.dark-mode .stock-summary .summary-card,
+html.dark-mode .filters-card,
+html.dark-mode .product-card,
+html.dark-mode .empty-state,
+html.dark-mode .modal-content {
+  background-color:#222526 !important;
+  color:#eee !important;
+}
+
+html.dark-mode .title,
+html.dark-mode .product-info h3,
+html.dark-mode .summary-card strong,
+html.dark-mode .stock-info strong,
+html.dark-mode .product-footer strong {
+  color:#eee !important;
+}
+
+html.dark-mode .subtitle,
+html.dark-mode .summary-card small,
+html.dark-mode .category,
+html.dark-mode .stock-info small,
+html.dark-mode .product-footer span,
+html.dark-mode .empty-state p {
+  color:#999 !important;
+}
+
+html.dark-mode .filters-card,
+html.dark-mode .search-box {
+  background-color:#222526 !important;
+}
+
+html.dark-mode .search-box,
+html.dark-mode .stock-info,
+html.dark-mode .icon-button,
+html.dark-mode .close-button,
+html.dark-mode .btn-secondary {
+  background-color:#2b2e30 !important;
+  color:#eee !important;
+}
+
+html.dark-mode .search-box input,
+html.dark-mode .filters-card select,
+html.dark-mode .input-group input,
+html.dark-mode .input-group select {
+  background-color:#2b2e30 !important;
+  color:#eee !important;
+  border-color:#45494c !important;
+}
+
+html.dark-mode .search-box input::placeholder {
+  color:#888 !important;
+}
+
+html.dark-mode .stock-bar {
+  background-color:#383b3d !important;
+}
+
+html.dark-mode .modal-header h2,
+html.dark-mode .input-group label,
+html.dark-mode .empty-state h3 {
+  color:#eee !important;
+}
+
+html.dark-mode .modal-header p {
+  color:#999 !important;
+}
+
+html.dark-mode .modal-overlay {
+  background:rgba(0,0,0,.7) !important;
+}
+
+/* =========================
+   LISTA DE COMPRAS - DARK MODE
+========================= */
+
+html.dark-mode .lista-compras-modal,
+html.dark-mode .modal {
+  background-color: #222526 !important;
+  color: #eeeeee !important;
+}
+
+html.dark-mode .modal h2,
+html.dark-mode .modal h3,
+html.dark-mode .modal strong {
+  color: #eeeeee !important;
+}
+
+html.dark-mode .modal p,
+html.dark-mode .modal small,
+html.dark-mode .modal span {
+  color: #999999;
+}
+
+html.dark-mode .modal .item {
+  background-color: #2b2e30 !important;
+  color: #eeeeee !important;
+}
+
+html.dark-mode .modal .quantidade strong {
+  color: #ffb74d !important;
+}
+
+html.dark-mode .modal .close {
+  background-color: #35383a !important;
+  color: #eeeeee !important;
+}
+
+html.dark-mode .modal .cancelar {
+  background-color: #35383a !important;
+  color: #eeeeee !important;
+}
+
+html.dark-mode .modal .pdf {
+  background-color: #90caf9 !important;
+  color: #18344a !important;
+}
+
+html.dark-mode .modal .header .icon {
+  background-color: #3a3025 !important;
+  color: #ffb74d !important;
+}
+
+html.dark-mode .modal .vazio h3 {
+  color: #eeeeee !important;
+}
+
+html.dark-mode .modal .vazio p {
+  color: #999999 !important;
+}
+
+html.dark-mode .btn-compras {
+  background-color: #2b2e30 !important;
+  border-color: #45494c !important;
+  color: #eeeeee !important;
+}
+
+html.dark-mode .btn-compras:hover {
+  background-color: #35383a !important;
 }

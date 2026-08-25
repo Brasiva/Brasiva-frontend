@@ -114,33 +114,44 @@ const dataFormatada = computed(() => {
   return new Date().toLocaleDateString('pt-BR', opcoes);
 });
 </script>
-
 <style scoped>
 .page-layout {
   display: flex;
+  width: 100%;
+  min-width: 0;
   min-height: 100vh;
   background-color: #f4f5f7;
   font-family: 'Poppins', sans-serif;
   color: #333;
+  overflow-x: hidden;
 }
 
 .main-content {
   flex: 1;
+  width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 .page-body {
-  padding: 20px 16px 40px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 16px 14px 35px;
 }
 
 /* ================= BANNER ================= */
 
 .welcome-banner {
   width: 100%;
-  min-height: 140px;
-  padding: 24px;
-  margin-bottom: 20px;
+  min-width: 0;
+  min-height: 130px;
+  box-sizing: border-box;
+  padding: 20px;
+  margin-bottom: 18px;
   border-radius: 15px;
   background: #c2c5c8;
   color: #fff;
@@ -152,14 +163,15 @@ const dataFormatada = computed(() => {
 
 .welcome-banner h2 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 700;
   line-height: 1.4;
+  overflow-wrap: break-word;
 }
 
 .welcome-banner p {
   margin: 6px 0 0;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   opacity: 0.9;
   text-transform: capitalize;
 }
@@ -167,15 +179,19 @@ const dataFormatada = computed(() => {
 /* ================= MÉTRICAS ================= */
 
 .metrics-grid {
+  width: 100%;
+  min-width: 0;
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
-  margin-bottom: 25px;
+  margin-bottom: 24px;
 }
 
 .metric-card {
+  min-width: 0;
+  box-sizing: border-box;
   background-color: #fff;
-  padding: 18px;
+  padding: 16px;
   border-radius: 15px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -187,37 +203,40 @@ const dataFormatada = computed(() => {
 }
 
 .metric-icon {
-  width: 38px;
-  height: 38px;
-  margin-bottom: 10px;
+  width: 36px;
+  height: 36px;
+  margin-bottom: 9px;
   border-radius: 10px;
   background-color: #fff3e0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 .metric-value {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 700;
   color: #ff8a00;
   line-height: 1.2;
+  overflow-wrap: break-word;
 }
 
 .metric-label {
   margin-top: 5px;
   color: #888;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 500;
 }
 
-/* ================= SEÇÃO PEDIDOS ================= */
+/* ================= PEDIDOS HEADER ================= */
 
 .section-header {
+  width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 12px;
   margin-bottom: 15px;
 }
@@ -238,11 +257,13 @@ const dataFormatada = computed(() => {
 .btn-orange,
 .btn-filter {
   flex: 1;
+  min-width: 0;
   min-height: 36px;
+  box-sizing: border-box;
   border-radius: 9px;
-  padding: 7px 12px;
+  padding: 7px 10px;
   font-family: 'Poppins', sans-serif;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
   transition: 0.2s ease;
@@ -268,20 +289,27 @@ const dataFormatada = computed(() => {
   background-color: #f8f8f8;
 }
 
-/* ================= PEDIDOS ================= */
+/* ================= GRID PEDIDOS ================= */
 
 .pedidos-grid {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 15px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
 }
 
 .pedido-card {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   background-color: #fff;
-  padding: 16px;
+  padding: 15px;
   border-radius: 15px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
 }
 
 .pedido-card:hover {
@@ -292,6 +320,7 @@ const dataFormatada = computed(() => {
 /* ================= CLIENTE ================= */
 
 .client-header {
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -301,9 +330,14 @@ const dataFormatada = computed(() => {
 .client-avatar {
   width: 40px;
   height: 40px;
+  min-width: 40px;
   border-radius: 50%;
   object-fit: cover;
   background-color: #f1f1f1;
+}
+
+.client-header > div {
+  min-width: 0;
 }
 
 .client-header strong {
@@ -311,6 +345,9 @@ const dataFormatada = computed(() => {
   color: #333;
   font-size: 0.85rem;
   font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .client-header small {
@@ -325,12 +362,15 @@ const dataFormatada = computed(() => {
 .info-box {
   flex: 1;
   min-width: 0;
-  padding: 9px 11px;
+  box-sizing: border-box;
+  padding: 9px 10px;
   border-radius: 9px;
   background-color: #f9f9f9;
+  overflow: hidden;
 }
 
 .info-box.full {
+  width: 100%;
   margin-bottom: 8px;
 }
 
@@ -338,20 +378,26 @@ const dataFormatada = computed(() => {
   display: block;
   margin-bottom: 3px;
   color: #999;
-  font-size: 0.65rem;
+  font-size: 0.63rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .info-box span,
 .info-box strong {
   display: block;
   color: #333;
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .info-row {
+  width: 100%;
+  min-width: 0;
   display: flex;
   gap: 8px;
   margin-bottom: 8px;
@@ -362,6 +408,7 @@ const dataFormatada = computed(() => {
 .btn-acessar {
   width: 100%;
   min-height: 38px;
+  box-sizing: border-box;
   margin-top: 5px;
   padding: 9px 12px;
   border: none;
@@ -379,6 +426,39 @@ const dataFormatada = computed(() => {
   background-color: #e87d00;
 }
 
+/* ================= TEMA ESCURO ================= */
+
+:global(html.dark-mode) .page-layout {
+  background-color: #181a1b;
+}
+
+:global(html.dark-mode) .metric-card,
+:global(html.dark-mode) .pedido-card {
+  background-color: #222526;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+:global(html.dark-mode) .metric-label,
+:global(html.dark-mode) .section-header h3,
+:global(html.dark-mode) .client-header strong {
+  color: #eeeeee;
+}
+
+:global(html.dark-mode) .btn-filter {
+  background-color: #2b2e30;
+  border-color: #45494c;
+  color: #eeeeee;
+}
+
+:global(html.dark-mode) .info-box {
+  background-color: #2b2e30;
+}
+
+:global(html.dark-mode) .info-box span,
+:global(html.dark-mode) .info-box strong {
+  color: #eeeeee;
+}
+
 /* ================= TABLET ================= */
 
 @media (min-width: 600px) {
@@ -387,16 +467,16 @@ const dataFormatada = computed(() => {
   }
 
   .welcome-banner {
-    min-height: 150px;
-    padding: 28px;
+    min-height: 145px;
+    padding: 25px;
   }
 
   .welcome-banner h2 {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
   }
 
   .metrics-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 15px;
   }
 
@@ -417,7 +497,7 @@ const dataFormatada = computed(() => {
   }
 
   .pedidos-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 18px;
   }
 }
@@ -430,16 +510,16 @@ const dataFormatada = computed(() => {
   }
 
   .welcome-banner {
-    min-height: 160px;
-    padding: 30px;
+    min-height: 155px;
+    padding: 28px;
   }
 
   .welcome-banner h2 {
-    font-size: 1.5rem;
+    font-size: 1.45rem;
   }
 
   .welcome-banner p {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
   }
 
   .metric-card {
@@ -447,11 +527,10 @@ const dataFormatada = computed(() => {
   }
 
   .metric-value {
-    font-size: 1.7rem;
+    font-size: 1.6rem;
   }
 
   .pedidos-grid {
-    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
 }
@@ -464,12 +543,12 @@ const dataFormatada = computed(() => {
   }
 
   .metrics-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 20px;
   }
 
   .pedidos-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 20px;
   }
 

@@ -173,31 +173,47 @@ export default {
     </div>
   </div>
 </template>
-
 <style scoped>
 .page-layout {
   display: flex;
+  width: 100%;
+  min-width: 0;
   min-height: 100vh;
   background-color: #f4f5f7;
   font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
 }
 
 .main-content {
   flex: 1;
+  width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 .page-body {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   padding: 20px 16px 40px;
 }
 
+/* ================= HEADER ================= */
+
 .header-page {
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 18px;
   margin-bottom: 22px;
+}
+
+.title {
+  min-width: 0;
 }
 
 .title h1 {
@@ -213,9 +229,12 @@ export default {
   font-size: 0.85rem;
 }
 
+/* ================= BOTÃO ================= */
+
 .add-button {
   width: 100%;
   min-height: 44px;
+  box-sizing: border-box;
   border: none;
   border-radius: 10px;
   background-color: #90caf9;
@@ -229,7 +248,7 @@ export default {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  transition: 0.2s;
+  transition: background-color 0.2s ease;
 }
 
 .add-button:hover {
@@ -240,18 +259,27 @@ export default {
   font-size: 20px;
 }
 
+/* ================= GRID ================= */
+
 .grid {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
 }
 
+/* ================= STATUS ================= */
+
 .status-info,
 .status-error {
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: #fff;
   padding: 12px 14px;
   border-radius: 10px;
   margin-bottom: 18px;
@@ -259,12 +287,13 @@ export default {
 }
 
 .status-info {
+  background-color: #fff;
   color: #1976d2;
 }
 
 .status-error {
-  color: #c62828;
   background-color: #ffebee;
+  color: #c62828;
 }
 
 .status-info .material-symbols-outlined,
@@ -272,7 +301,11 @@ export default {
   font-size: 19px;
 }
 
+/* ================= ESTADO VAZIO ================= */
+
 .empty-state {
+  width: 100%;
+  box-sizing: border-box;
   background-color: #fff;
   border-radius: 15px;
   padding: 40px 20px;
@@ -297,9 +330,14 @@ export default {
   font-size: 0.8rem;
 }
 
+/* ================= MODAL ================= */
+
 .overlay {
   position: fixed;
   inset: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
   background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
@@ -307,7 +345,46 @@ export default {
   padding: 16px;
   z-index: 999;
   overflow-y: auto;
+  overflow-x: hidden;
 }
+
+/* ================= TEMA ESCURO ================= */
+
+:global(html.dark-mode) .page-layout {
+  background-color: #181a1b;
+}
+
+:global(html.dark-mode) .title h1 {
+  color: #eeeeee;
+}
+
+:global(html.dark-mode) .title p {
+  color: #999999;
+}
+
+:global(html.dark-mode) .status-info {
+  background-color: #222526;
+}
+
+:global(html.dark-mode) .empty-state {
+  background-color: #222526;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+:global(html.dark-mode) .empty-state h3 {
+  color: #eeeeee;
+}
+
+:global(html.dark-mode) .empty-state p {
+  color: #999999;
+}
+
+:global(html.dark-mode) .status-error {
+  background-color: #3a2527;
+  color: #ff8a80;
+}
+
+/* ================= TABLET ================= */
 
 @media (min-width: 600px) {
   .page-body {
@@ -325,10 +402,12 @@ export default {
   }
 
   .grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 20px;
   }
 }
+
+/* ================= DESKTOP ================= */
 
 @media (min-width: 768px) {
   .page-body {
@@ -340,10 +419,12 @@ export default {
   }
 
   .grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 22px;
   }
 }
+
+/* ================= DESKTOP GRANDE ================= */
 
 @media (min-width: 1024px) {
   .page-body {
@@ -359,7 +440,7 @@ export default {
   }
 
   .grid {
-    grid-template-columns: repeat(3, minmax(260px, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 20px;
   }
 }
