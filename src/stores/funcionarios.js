@@ -17,6 +17,25 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Função auxiliar para formatar o telefone no padrão aceito pela API
+function formatarTelefone(telefone) {
+  if (!telefone) return "";
+
+  // Remove todos os caracteres não numéricos
+  let apenasNumeros = String(telefone).replace(/\D/g, "");
+
+  // Se já tiver + no início ou for padrão válido, ajusta para o formato internacional com +
+  if (apenasNumeros.length === 10 || apenasNumeros.length === 11) {
+    return `+55${apenasNumeros}`;
+  }
+
+  if (apenasNumeros.length === 12 || apenasNumeros.length === 13) {
+    return `+${apenasNumeros}`;
+  }
+
+  return apenasNumeros;
+}
+
 export const useFuncionarioStore = defineStore("funcionarios", {
   state: () => ({
     funcionarios: [],
@@ -25,14 +44,26 @@ export const useFuncionarioStore = defineStore("funcionarios", {
   }),
 
   actions: {
-  
+    // ============================
+    // BUSCAR FUNCIONÁRIOS
+    // ============================
     async buscarFuncionarios() {
       this.carregando = true;
       this.erro = null;
 
       try {
         const resposta = await api.get("/funcionarios/");
-        this.funcionarios = resposta.data;
+
+        // Trata o retorno para garantir que this.funcionarios seja SEMPRE um Array
+        if (Array.isArray(resposta.data)) {
+          this.funcionarios = resposta.data;
+        } else if (Array.isArray(resposta.data.results)) {
+          this.funcionarios = resposta.data.results;
+        } else if (Array.isArray(resposta.data.funcionarios)) {
+          this.funcionarios = resposta.data.funcionarios;
+        } else {
+          this.funcionarios = [];
+        }
       } catch (err) {
         console.error(err);
         this.erro = "Erro ao carregar funcionários.";
@@ -70,7 +101,6 @@ export const useFuncionarioStore = defineStore("funcionarios", {
       try {
         let attachmentKey = null;
 
-        // Upload da imagem primeiro
         if (dadosForm.foto instanceof File) {
           attachmentKey = await this.uploadFoto(
             dadosForm.foto,
@@ -81,7 +111,7 @@ export const useFuncionarioStore = defineStore("funcionarios", {
         const payload = {
           nome: dadosForm.nome,
           cargo: dadosForm.cargo,
-          telefone: dadosForm.telefone,
+          telefone: formatarTelefone(dadosForm.telefone),
           pagamento: dadosForm.pagamento,
         };
 
@@ -91,7 +121,12 @@ export const useFuncionarioStore = defineStore("funcionarios", {
 
         const resposta = await api.post("/funcionarios/", payload);
 
-        this.funcionarios.push(resposta.data);
+        // Garante que this.funcionarios é um array antes de fazer o push
+        if (Array.isArray(this.funcionarios)) {
+          this.funcionarios.push(resposta.data);
+        } else {
+          this.funcionarios = [resposta.data];
+        }
 
         return resposta.data;
       } catch (err) {
@@ -127,7 +162,7 @@ export const useFuncionarioStore = defineStore("funcionarios", {
         const payload = {
           nome: dadosForm.nome,
           cargo: dadosForm.cargo,
-          telefone: dadosForm.telefone,
+          telefone: formatarTelefone(dadosForm.telefone),
           pagamento: dadosForm.pagamento,
         };
 
@@ -140,12 +175,14 @@ export const useFuncionarioStore = defineStore("funcionarios", {
           payload
         );
 
-        const index = this.funcionarios.findIndex(
-          (f) => f.id === id
-        );
+        if (Array.isArray(this.funcionarios)) {
+          const index = this.funcionarios.findIndex(
+            (f) => f.id === id
+          );
 
-        if (index !== -1) {
-          this.funcionarios[index] = resposta.data;
+          if (index !== -1) {
+            this.funcionarios[index] = resposta.data;
+          }
         }
 
         return resposta.data;
@@ -171,9 +208,11 @@ export const useFuncionarioStore = defineStore("funcionarios", {
       try {
         await api.delete(`/funcionarios/${id}/`);
 
-        this.funcionarios = this.funcionarios.filter(
-          (f) => f.id !== id
-        );
+        if (Array.isArray(this.funcionarios)) {
+          this.funcionarios = this.funcionarios.filter(
+            (f) => f.id !== id
+          );
+        }
       } catch (err) {
         console.error(err);
 
