@@ -219,12 +219,11 @@ const deletarPrato = (id) => {
 .cardapio-page {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  font-family: sans-serif;
-  padding: 1rem 1rem 3rem 1rem;
+  padding: 2rem;
   box-sizing: border-box;
+  min-height: 100vh;
+  background-color: #f4f5f7;
+  font-family: 'Poppins', sans-serif;
 }
 
 .cardapio-header {
@@ -236,25 +235,32 @@ const deletarPrato = (id) => {
 }
 
 .textos-topo h2 {
-  color: #FF9500;
   font-size: 1.6rem;
   margin: 0;
 }
 .textos-topo p {
-  font-size: 0.9rem;
-  color: #666;
-  margin: 0;
+  margin: 5px 0 0;
+  color: #888;
+  font-size: 0.85rem;
 }
 
 .btn-adicionar {
-  background-color: #FF9500;
-  color: white;
+  min-height: 44px;
+  box-sizing: border-box;
   border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 20px;
-  font-weight: bold;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background-color: #90caf9;
+  color: #333;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(255, 149, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: background-color 0.2s ease;
 }
 
 /* Grid Ajustado */
@@ -266,8 +272,8 @@ const deletarPrato = (id) => {
 
 .card-prato-compacto {
   background-color: #ffffff;
-  border: 4px solid #FF9500;
-  border-radius: 12px;
+  padding: 12px;
+  border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
   display: flex;
@@ -280,7 +286,7 @@ const deletarPrato = (id) => {
 
 .placeholder-imagem-card {
   height: 120px;
-  background-color: #f7f7f7;
+  background-color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -292,8 +298,9 @@ const deletarPrato = (id) => {
 }
 
 .faixa-titulo {
-  background-color: #FF9500;
-  color: white;
+  background-color: #EBEBEB;
+  border-radius: 6px;
+  border: 1px solid #b0b0b0;
   text-align: center;
   padding: 0.5rem;
   font-weight: bold;
