@@ -1,19 +1,25 @@
-import { fileURLToPath, URL } from 'node:url';
-
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import vueDevTools from 'vite-plugin-vue-devtools';
-import { VitePWA } from 'vite-plugin-pwa';
+import { fileURLToPath, URL } from 'node:url'
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import vueDevTools from 'vite-plugin-vue-devtools'
+import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   plugins: [
     vue(),
+
     VitePWA({
       registerType: 'autoUpdate',
+
+      devOptions: {
+        enabled: false
+      },
+
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,jpeg,svg,woff2}'],
         cleanupOutdatedCaches: true,
         sourcemap: false,
+
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -22,13 +28,14 @@ export default defineConfig({
               cacheName: 'google-fonts-cache',
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 ano
+                maxAgeSeconds: 60 * 60 * 24 * 365
               },
               cacheableResponse: {
-                statuses: [0, 200],
-              },
-            },
+                statuses: [0, 200]
+              }
+            }
           },
+
           {
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: 'CacheFirst',
@@ -36,13 +43,14 @@ export default defineConfig({
               cacheName: 'gstatic-fonts-cache',
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 ano
+                maxAgeSeconds: 60 * 60 * 24 * 365
               },
               cacheableResponse: {
-                statuses: [0, 200],
-              },
-            },
+                statuses: [0, 200]
+              }
+            }
           },
+
           {
             urlPattern: /^http:\/\/localhost:8001\/.*/i,
             handler: 'NetworkFirst',
@@ -50,16 +58,17 @@ export default defineConfig({
               cacheName: 'api-cache',
               expiration: {
                 maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24, // 24 horas
+                maxAgeSeconds: 60 * 60 * 24
               },
               cacheableResponse: {
-                statuses: [0, 200],
+                statuses: [0, 200]
               },
-              networkTimeoutSeconds: 10,
-            },
-          },
-        ],
+              networkTimeoutSeconds: 10
+            }
+          }
+        ]
       },
+
       manifest: {
         id: 'com.brasiva-pwa',
         name: 'Brasiva',
@@ -74,30 +83,29 @@ export default defineConfig({
           {
             src: '/icons/icon-192x192.png',
             sizes: '192x192',
-            type: 'image/png',
+            type: 'image/png'
+          },
+          {
+            src: '/icons/icon-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
           },
           {
             src: '/icons/icon-512x512.png',
             sizes: '512x512',
             type: 'image/png',
-          },
-          {
-            src: '/icons/icon-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'maskable',
-          },
-        ],
-      },
-      devOptions: {
-        enabled: true,
-      },
+            purpose: 'maskable'
+          }
+        ]
+      }
     }),
-    vueDevTools(),
+
+    vueDevTools()
   ],
+
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-    },
-  },
-});
+      '@': fileURLToPath(new URL('./src', import.meta.url))
+    }
+  }
+})
