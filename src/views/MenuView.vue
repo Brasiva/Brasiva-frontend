@@ -10,18 +10,37 @@
       <button @click="abrirModalNovoPrato" class="btn-adicionar"> + Adicionar Prato </button>
     </div>
     <!-- GRID DOS PRATOS -->
-    <div class="cardapio-grid">
-      <div v-for="prato in listaPratos" :key="prato.id" class="prato-container" >
-      <!-- CARD COMPACTO -->
-        <div class="card-prato-compacto"
-        @click="selecionarPrato(prato.id)" >
-          <div class="placeholder-imagem-card">
+    <div v-if="listaPratos.length" class="cardapio-grid">
+      <div
+      v-for="prato in listaPratos"
+      :key="prato.id"
+      class="prato-container">
+      <div
+        class="card-prato-compacto"
+        @click="selecionarPrato(prato.id)">
+        <div class="placeholder-imagem-card">
           <i class="fa-solid fa-utensils"></i>
-          </div>
-          <div class="faixa-titulo"> {{ (prato.nome || '').toUpperCase() }}</div>
+        </div>
+
+        <div class="faixa-titulo">
+          {{ (prato.nome || '').toUpperCase() }}
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- ESTADO VAZIO -->
+  <div v-else class="empty-state">
+    <span class="material-symbols-outlined">
+      restaurant_menu
+    </span>
+
+    <h3>Nenhum prato cadastrado</h3>
+
+    <p>
+      Clique em "Adicionar Prato" para cadastrar o primeiro.
+    </p>
+  </div>
 
         <!-- MODAL DE DETALHES DO PRATO -->
     <div v-if="pratoSelecionado" class="modal-overlay" @click.self="fecharDetalhes" >
@@ -277,7 +296,34 @@ const deletarPrato = async (id) => {
 .prato-container { 
   display: flex; 
   justify-content: center; 
-} 
+}
+/* ================= ESTADO VAZIO ================= */
+.empty-state {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #fff;
+  border-radius: 15px;
+  padding: 40px 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.empty-state .material-symbols-outlined {
+  font-size: 45px;
+  color: #FF9500;
+}
+
+.empty-state h3 {
+  margin: 12px 0 5px;
+  color: #333;
+  font-size: 1rem;
+}
+
+.empty-state p {
+  margin: 0;
+  color: #888;
+  font-size: 0.8rem;
+}
 /*CARD COMPACTO*/ 
 .card-prato-compacto { 
   background-color: #ffffff; 
@@ -561,7 +607,7 @@ const deletarPrato = async (id) => {
   border-radius: 20px; 
   font-weight: bold; 
   cursor: pointer; 
-} 
+}
 /*MOBILE*/ 
 @media (max-width: 500px) { 
   .cardapio-page { 
