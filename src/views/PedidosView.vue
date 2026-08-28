@@ -1,21 +1,58 @@
 <template>
   <div class="page-layout">
     <div class="main-content">
-      <Header v-if="temHeader" />
-
       <div class="page-body">
-        <h2 class="title">Pedidos disponíveis</h2>
 
-        <!-- Lista de pedidos -->
-        <div v-if="pedidos.length > 0" class="cards-grid">
+        <div class="header-area">
+          <div>
+            <span class="section-label">Gerenciamento</span>
+            <h2 class="title">Pedidos disponíveis</h2>
+          </div>
+
+          <div class="date-filter">
+            <span class="material-symbols-outlined">
+              calendar_month
+            </span>
+
+            <input
+              v-model="dataFiltro"
+              type="date"
+            />
+
+            <button
+              v-if="dataFiltro"
+              class="clear-filter"
+              @click="dataFiltro = ''"
+              title="Limpar filtro"
+            >
+              <span class="material-symbols-outlined">
+                close
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div
+          v-if="pedidosFiltrados.length"
+          class="cards-grid"
+        >
           <div
-            v-for="pedido in pedidos"
+            v-for="pedido in pedidosFiltrados"
             :key="pedido.id"
             class="pedido-card"
           >
             <div class="card-header">
-              <h3>#{{ pedido.id }} - {{ pedido.tipo }}</h3>
-              <span class="status-badge"></span>
+              <div>
+                <span class="card-id">#{{ pedido.id }}</span>
+                <h3>{{ pedido.tipo }}</h3>
+              </div>
+
+              <span
+                class="status-dot"
+                :style="{
+                  backgroundColor: appStore.getCorEvento(pedido.tipo)
+                }"
+              ></span>
             </div>
 
             <div class="info-block">
@@ -28,9 +65,16 @@
               <span>{{ pedido.cliente }}</span>
             </div>
 
-            <div class="info-block">
-              <small>Número de pessoas</small>
-              <span>{{ pedido.pessoas }}</span>
+            <div class="info-row">
+              <div class="info-block">
+                <small>Pessoas</small>
+                <span>{{ pedido.pessoas }}</span>
+              </div>
+
+              <div class="info-block">
+                <small>Data</small>
+                <span>{{ formatarData(pedido.dataHora) }}</span>
+              </div>
             </div>
 
             <div class="info-block">
@@ -38,35 +82,115 @@
               <span>{{ pedido.dataHora }}</span>
             </div>
 
-            <button class="btn-acessar" @click="abrirModal(pedido)">
-              Acessar Pedido
+            <button
+              class="btn-acessar"
+              @click="abrirModal(pedido)"
+            >
+              Acessar pedido
             </button>
           </div>
         </div>
 
         <div v-else class="empty-state">
-          <p>Nenhum pedido pendente no momento.</p>
+          <span class="material-symbols-outlined">
+            search_off
+          </span>
+
+          <p>
+            {{
+              dataFiltro
+                ? 'Nenhum pedido encontrado nessa data.'
+                : 'Nenhum pedido pendente no momento.'
+            }}
+          </p>
         </div>
+
       </div>
 
-      <!-- Modal de detalhe/aceite de pedido -->
-      <div v-if="pedidoSelecionado" class="modal-overlay" @click.self="pedidoSelecionado = null">
+      <div
+        v-if="pedidoSelecionado"
+        class="modal-overlay"
+        @click.self="fecharModal"
+      >
         <div class="modal-content">
-          <button class="close-btn" @click="pedidoSelecionado = null">✕</button>
 
-          <h2>#{{ pedidoSelecionado.id }} - {{ pedidoSelecionado.tipo }}</h2>
+          <button
+            class="close-btn"
+            @click="fecharModal"
+          >
+            <span class="material-symbols-outlined">
+              close
+            </span>
+          </button>
+
+          <div class="modal-title">
+            <div
+              class="modal-icon"
+              :style="{
+                backgroundColor: appStore.getCorEvento(
+                  pedidoSelecionado.tipo
+                )
+              }"
+            >
+              <span class="material-symbols-outlined">
+                receipt_long
+              </span>
+            </div>
+
+            <div>
+              <span>#{{ pedidoSelecionado.id }}</span>
+              <h2>{{ pedidoSelecionado.tipo }}</h2>
+            </div>
+          </div>
 
           <div class="grid-details">
-            <div class="info-block"><small>Cliente</small><span>{{ pedidoSelecionado.cliente }}</span></div>
-            <div class="info-block"><small>Valor</small><strong>{{ pedidoSelecionado.orcamento }}</strong></div>
-            <div class="info-block"><small>Data/Hora</small><span>{{ pedidoSelecionado.dataHora }}</span></div>
-            <div class="info-block"><small>Pessoas</small><span>{{ pedidoSelecionado.pessoas }}</span></div>
+
+            <div class="info-block">
+              <small>Cliente</small>
+              <span>{{ pedidoSelecionado.cliente }}</span>
+            </div>
+
+            <div class="info-block">
+              <small>Valor</small>
+              <strong>{{ pedidoSelecionado.orcamento }}</strong>
+            </div>
+
+            <div class="info-block">
+              <small>Data e hora</small>
+              <span>{{ pedidoSelecionado.dataHora }}</span>
+            </div>
+
+            <div class="info-block">
+              <small>Pessoas</small>
+              <span>{{ pedidoSelecionado.pessoas }}</span>
+            </div>
+
+            <div class="info-block full">
+              <small>Endereço</small>
+              <span>{{ pedidoSelecionado.endereco }}</span>
+            </div>
+
           </div>
 
           <div class="modal-actions">
-            <button class="btn-recusar" @click="recusarPedido(pedidoSelecionado.id)">Recusar</button>
-            <button class="btn-aceitar" @click="aceitarPedido(pedidoSelecionado)">Aceitar Pedido</button>
+            <button
+              class="btn-recusar"
+              @click="recusarPedido"
+            >
+              Recusar
+            </button>
+
+            <button
+              class="btn-aceitar"
+              @click="aceitarPedido"
+            >
+              <span class="material-symbols-outlined">
+                check
+              </span>
+              Aceitar pedido
+            </button>
           </div>
+
         </div>
       </div>
 
@@ -75,74 +199,368 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue'
+import { useAppStore } from '@/stores/appStore.js'
 
-const pedidos = ref([
-  {
-    id: '0001',
-    tipo: 'Casamento',
-    orcamento: 'R$ 22.023,10',
-    cliente: 'Giovana Rosa',
-    pessoas: 50,
-    dataHora: '28/07/2026 19:00 - 20:00',
-    endereco: 'Rua das Bobs, 0 - Centro - Joinville, SC'
-  },
-  {
-    id: '0002',
-    tipo: 'Aniversário',
-    orcamento: 'R$ 5.400,00',
-    cliente: 'Carlos Eduardo',
-    pessoas: 30,
-    dataHora: '17/07/2026 18:00',
-    endereco: 'Av. Brasil, 1500 - Joinville, SC'
+const appStore = useAppStore()
+
+const pedidoSelecionado = ref(null)
+const dataFiltro = ref('')
+
+const pedidosFiltrados = computed(() => {
+  if (!dataFiltro.value) {
+    return appStore.pedidos
   }
-]);
 
-const pedidoSelecionado = ref(null);
+  return appStore.pedidos.filter(
+    pedido => pedido.dataISO === dataFiltro.value
+  )
+})
 
 function abrirModal(pedido) {
-  pedidoSelecionado.value = pedido;
+  pedidoSelecionado.value = pedido
 }
 
-function recusarPedido(id) {
-  pedidos.value = pedidos.value.filter(p => p.id !== id);
-  pedidoSelecionado.value = null;
+function fecharModal() {
+  pedidoSelecionado.value = null
 }
 
-function aceitarPedido(pedido) {
-  pedidos.value = pedidos.value.filter(p => p.id !== pedido.id);
-  pedidoSelecionado.value = null;
-  alert('Pedido aceito com sucesso! Ele foi movido para os Eventos.');
+function recusarPedido() {
+  if (!pedidoSelecionado.value) {
+    return
+  }
+
+  appStore.recusarPedido(
+    pedidoSelecionado.value.id
+  )
+
+  fecharModal()
+}
+
+function aceitarPedido() {
+  if (!pedidoSelecionado.value) {
+    return
+  }
+
+  appStore.aceitarPedido(
+    pedidoSelecionado.value
+  )
+
+  fecharModal()
+}
+
+function formatarData(dataHora) {
+  return dataHora?.split(' ')[0] || ''
 }
 </script>
 
 <style scoped>
-.page-layout { display: flex; min-height: 100vh; background-color: #f4f5f7; font-family: 'Poppins', sans-serif; }
-.main-content { flex: 1; display: flex; flex-direction: column; }
-.page-body { padding: 20px 30px; }
-.title { font-size: 1.4rem; font-weight: 700; color: #333; margin-bottom: 20px; }
+.page-layout {
+  min-height: 100vh;
+  background: #f4f5f7;
+  font-family: 'Poppins', sans-serif;
+}
 
-.cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.pedido-card { background: #ffffff; padding: 20px; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.card-header h3 { font-size: 1.1rem; font-weight: 700; margin: 0; }
-.status-badge { width: 12px; height: 12px; border-radius: 50%; background: #f8bbd0; }
+.main-content {
+  min-height: 100vh;
+}
 
-.info-block { background: #f9f9f9; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; }
-.info-block small { display: block; color: #888; font-size: 10px; }
-.info-block span, .info-block strong { font-size: 0.85rem; color: #333; }
+.page-body {
+  padding: 28px 35px;
+  max-width: 1450px;
+  margin: 0 auto;
+}
 
-.btn-acessar { width: 100%; background: #333; color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+.header-area {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 20px;
+  margin-bottom: 22px;
+}
 
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-.modal-content { background: #ffffff; padding: 25px; border-radius: 16px; width: 450px; max-width: 90%; position: relative; }
-.close-btn { position: absolute; right: 15px; top: 15px; border: none; background: transparent; cursor: pointer; font-size: 16px; }
+.section-label {
+  color: #ff9500;
+  font-size: .68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
 
-.grid-details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
-.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
-.btn-recusar { flex: 1; background: #ffebee; color: #c62828; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; }
-.btn-aceitar { flex: 1; background: #e8f5e9; color: #2e7d32; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.title {
+  color: #333;
+  font-size: 1.25rem;
+  margin: 2px 0 0;
+}
 
-@media (max-width: 1024px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 768px) { .cards-grid { grid-template-columns: 1fr; } }
+.date-filter {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 9px;
+  padding: 6px 9px;
+}
+
+.date-filter > span {
+  font-size: 18px;
+  color: #888;
+}
+
+.date-filter input {
+  border: 0;
+  outline: 0;
+  color: #555;
+  font-family: inherit;
+  font-size: .72rem;
+}
+
+.clear-filter {
+  border: 0;
+  background: transparent;
+  color: #999;
+  cursor: pointer;
+  display: flex;
+}
+
+.clear-filter span {
+  font-size: 17px;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.pedido-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 14px;
+  padding: 17px;
+  transition: .2s;
+}
+
+.pedido-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 18px rgba(0, 0, 0, .06);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 13px;
+}
+
+.card-id {
+  color: #999;
+  font-size: .65rem;
+}
+
+.card-header h3 {
+  color: #333;
+  font-size: .92rem;
+  margin: 1px 0 0;
+}
+
+.status-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+
+.info-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.info-block {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 7px;
+}
+
+.info-block small {
+  display: block;
+  color: #999;
+  font-size: .58rem;
+  margin-bottom: 2px;
+}
+
+.info-block span,
+.info-block strong {
+  color: #444;
+  font-size: .73rem;
+}
+
+.btn-acessar {
+  width: 100%;
+  border: 0;
+  background: #333;
+  color: #fff;
+  border-radius: 8px;
+  padding: 9px;
+  margin-top: 5px;
+  font-size: .7rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.empty-state {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 14px;
+  padding: 45px;
+  text-align: center;
+  color: #999;
+}
+
+.empty-state span {
+  font-size: 32px;
+  color: #ccc;
+}
+
+.empty-state p {
+  font-size: .75rem;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  z-index: 2000;
+}
+
+.modal-content {
+  position: relative;
+  width: 450px;
+  max-width: 100%;
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  border: 0;
+  background: #f5f5f5;
+  width: 31px;
+  height: 31px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.close-btn span {
+  font-size: 18px;
+}
+
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 18px;
+}
+
+.modal-title > div:last-child > span {
+  color: #999;
+  font-size: .65rem;
+}
+
+.modal-title h2 {
+  margin: 1px 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.modal-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-icon span {
+  color: #555;
+  font-size: 21px;
+}
+
+.grid-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.full {
+  grid-column: span 2;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 9px;
+  margin-top: 17px;
+}
+
+.btn-recusar,
+.btn-aceitar {
+  flex: 1;
+  border: 0;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: .7rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-recusar {
+  background: #fff1f1;
+  color: #c62828;
+}
+
+.btn-aceitar {
+  background: #edf8ef;
+  color: #2e7d32;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.btn-aceitar span {
+  font-size: 17px;
+}
+
+@media (max-width: 1050px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .page-body {
+    padding: 20px 15px;
+  }
+
+  .header-area {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>

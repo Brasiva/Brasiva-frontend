@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 import DashboardLayout from '../layouts/DashboardLayout.vue'
 
@@ -13,6 +14,7 @@ import Employee from '../views/EmployeeView.vue'
 import Budget from '../views/BudgetView.vue'
 import Perfil from '../views/PerfilView.vue'
 import Config from '../views/ConfigView.vue'
+import Notificacoes from '../views/NotificacoesView.vue'
 
 
 // Views da página inicial
@@ -28,27 +30,34 @@ const routes = [
   },
   {
     path: '/inicio',
-    component: PaginaInicial
+    component: PaginaInicial,
+    meta: { requiresAuth: false }
   },
   {
     path: '/cadastro',
-    component: CadastroView
+    component: CadastroView,
+    meta: { requiresAuth: false }
   },
   {
     path: '/login',
-    component: LoginView
+    name: 'Login',
+    component: LoginView,
+    meta: { requiresAuth: false }
   },
   {
     path: '/recuperar-senha',
-    component: RecuperarSenhaView
+    component: RecuperarSenhaView,
+    meta: { requiresAuth: false }
   },
 
   {
     path: '/',
     component: DashboardLayout,
+    meta: { requiresAuth: true },
     children: [
       {
         path: 'home',
+        name: 'Home',
         component: Home
       },
       {
@@ -86,6 +95,10 @@ const routes = [
       {
         path: 'configuracoes',
         component: Config
+      },
+      {
+        path: 'notificacoes',
+        component: Notificacoes
       }
     ]
   }
@@ -94,6 +107,21 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore()
+  const estaAutenticado = !!authStore.token || !!localStorage.getItem('token')
+
+  if (to.matched.some(record => record.meta.requiresAuth) && !estaAutenticado) {
+    return next({ name: 'Login' })
+  }
+
+  if (to.name === 'Login' && estaAutenticado) {
+    return next({ name: 'Home' })
+  }
+
+  next()
 })
 
 export default router

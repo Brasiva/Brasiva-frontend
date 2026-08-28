@@ -566,3 +566,137 @@ html.dark-mode .btn-compras {
 html.dark-mode .btn-compras:hover {
   background-color: #35383a !important;
 }
+/* ========================================
+   MODO ESCURO - CARDS DE FUNCIONÁRIOS
+   ======================================== */
+
+html.dark-mode .employee-card {
+  background-color: #222526 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid #383b3d !important;
+}
+
+html.dark-mode .employee-card .employee-title h3 {
+  color: #eeeeee !important;
+}
+
+html.dark-mode .employee-card .employee-title span {
+  color: #999999 !important;
+}
+
+html.dark-mode .employee-card .employee-photo {
+  background-color: #1e293b !important;
+  color: #90caf9 !important;
+}
+
+html.dark-mode .employee-card .info-block {
+  background-color: #2b2e30 !important;
+}
+
+html.dark-mode .employee-card .info-block small {
+  color: #999999 !important;
+}
+
+html.dark-mode .employee-card .info-block span,
+html.dark-mode .employee-card .info-block strong {
+  color: #eeeeee !important;
+}
+
+/* Botões de Ação */
+html.dark-mode .employee-card .edit-button {
+  background-color: rgba(25, 118, 210, 0.2) !important;
+  color: #90caf9 !important;
+}
+
+html.dark-mode .employee-card .edit-button:hover {
+  background-color: rgba(25, 118, 210, 0.35) !important;
+}
+
+html.dark-mode .employee-card .delete-button {
+  background-color: rgba(198, 40, 40, 0.2) !important;
+  color: #ef9a9a !important;
+}
+
+html.dark-mode .employee-card .delete-button:hover {
+  background-color: rgba(198, 40, 40, 0.35) !important;
+}
+/* ========================================
+   MODO ESCURO - FORMULÁRIO DE FUNCIONÁRIO
+   ======================================== */
+html.dark-mode .form-card {
+  background-color: #222526 !important;
+  color: #eeeeee !important;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark-mode .form-header h2 {
+  color: #eeeeee !important;
+}
+
+html.dark-mode .form-header p {
+  color: #999999 !important;
+}
+
+html.dark-mode .close-button {
+  background-color: #2b2e30 !important;
+  color: #eeeeee !important;
+}
+
+html.dark-mode .close-button:hover {
+  background-color: #35383a !important;
+}
+
+/* Área de Pré-visualização da Imagem */
+html.dark-mode .preview {
+  background-color: #2b2e30 !important;
+  border-color: #45494c !important;
+}
+
+html.dark-mode .preview .material-symbols-outlined {
+  color: #666666 !important;
+}
+
+html.dark-mode .btn-upload {
+  background-color: rgba(144, 202, 249, 0.15) !important;
+  color: #90caf9 !important;
+}
+
+html.dark-mode .btn-upload:hover {
+  background-color: rgba(144, 202, 249, 0.25) !important;
+}
+
+html.dark-mode .form-card .input-group label {
+  color: #eeeeee !important;
+}
+
+html.dark-mode .form-card .input-group input {
+  background-color: #2b2e30 !important;
+  color: #eeeeee !important;
+  border-color: #45494c !important;
+}
+
+html.dark-mode .form-card .input-group input::placeholder {
+  color: #777777 !important;
+}
+
+html.dark-mode .form-card .input-group input:focus {
+  border-color: #90caf9 !important;
+  box-shadow: 0 0 0 3px rgba(144, 202, 249, 0.15) !important;
+}
+
+/* Botões do Formulário */
+html.dark-mode .form-card .btn-cancel {
+  background-color: #2b2e30 !important;
+  color: #eeeeee !important;
+  border: 1px solid #45494c !important;
+}
+html.dark-mode .form-card .btn-cancel:hover {
+  background-color: #35383a !important;
+}
+html.dark-mode .form-card .btn-save {
+  background-color: #90caf9 !important;
+  color: #121212 !important;
+}
+html.dark-mode .form-card .btn-save:hover {
+  background-color: #64b5f6 !important;
+}
