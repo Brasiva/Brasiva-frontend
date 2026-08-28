@@ -17,25 +17,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Função auxiliar para formatar o telefone no padrão aceito pela API
-function formatarTelefone(telefone) {
-  if (!telefone) return "";
-
-  // Remove todos os caracteres não numéricos
-  let apenasNumeros = String(telefone).replace(/\D/g, "");
-
-  // Se já tiver + no início ou for padrão válido, ajusta para o formato internacional com +
-  if (apenasNumeros.length === 10 || apenasNumeros.length === 11) {
-    return `+55${apenasNumeros}`;
-  }
-
-  if (apenasNumeros.length === 12 || apenasNumeros.length === 13) {
-    return `+${apenasNumeros}`;
-  }
-
-  return apenasNumeros;
-}
-
 export const useFuncionarioStore = defineStore("funcionarios", {
   state: () => ({
     funcionarios: [],
@@ -95,15 +76,21 @@ export const useFuncionarioStore = defineStore("funcionarios", {
     // HELPER: PREPARAR PAYLOAD
     // ============================
     prepararPayload(dadosForm, attachmentKey = null) {
-      // 1. Mantém apenas os dígitos numéricos (remove +, parênteses, traços e espaços)
+      // 1. Extrai apenas os números do telefone
       const apenasNumeros = dadosForm.telefone
         ? String(dadosForm.telefone).replace(/\D/g, "")
         : "";
 
-      // 2. Se a string começar com 55 e tiver 13 dígitos, remove o 55 para deixar só o DDD + Número (11 dígitos)
-      let telefoneLimpo = apenasNumeros;
-      if (apenasNumeros.length === 13 && apenasNumeros.startsWith("55")) {
-        telefoneLimpo = apenasNumeros.slice(2);
+      // 2. Formata para o padrão aceito pelo Django (E.164 com +55)
+      let telefoneFormatado = "";
+      if (apenasNumeros) {
+        if (apenasNumeros.length === 13 && apenasNumeros.startsWith("55")) {
+          telefoneFormatado = `+${apenasNumeros}`;
+        } else if (apenasNumeros.length === 10 || apenasNumeros.length === 11) {
+          telefoneFormatado = `+55${apenasNumeros}`;
+        } else {
+          telefoneFormatado = apenasNumeros;
+        }
       }
 
       // 3. Garante que pagamento seja enviado como número float/decimal
@@ -114,7 +101,7 @@ export const useFuncionarioStore = defineStore("funcionarios", {
       const payload = {
         nome: dadosForm.nome,
         cargo: dadosForm.cargo,
-        telefone: dadosForm.telefone || "", // Envia exatamente "(47) 99999-9999"
+        telefone: telefoneFormatado,
         pagamento: pagamentoNumero,
       };
 
