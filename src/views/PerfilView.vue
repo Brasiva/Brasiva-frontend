@@ -1,4 +1,3 @@
-```vue
 <template>
   <div class="page-layout">
     <div class="main-content">
@@ -14,9 +13,36 @@
         <div class="profile-card">
 
           <div class="profile-header">
-            <div class="avatar">
-              {{ inicialUsuario }}
+            <!-- Avatar Interativo -->
+            <div
+              class="avatar-container"
+              :class="{ 'editable': editando }"
+              @click="editando && acionarInputFoto()"
+            >
+              <img
+                v-if="previewFoto || usuarioAtual.foto || usuarioAtual.avatar"
+                :src="previewFoto || usuarioAtual.foto || usuarioAtual.avatar"
+                alt="Foto do perfil"
+                class="avatar-img"
+              />
+              <div v-else class="avatar">
+                {{ inicialUsuario }}
+              </div>
+
+              <!-- Overlay indicando a possibilidade de alterar a foto -->
+              <div v-if="editando" class="avatar-overlay">
+                <span class="material-symbols-outlined">photo_camera</span>
+              </div>
             </div>
+
+            <!-- Input invisível para seleção de arquivo -->
+            <input
+              ref="fileInput"
+              type="file"
+              accept="image/*"
+              style="display: none;"
+              @change="aoSelecionarFoto"
+            />
 
             <div class="profile-name">
               <h2>{{ usuarioAtual.nome || usuarioAtual.name || 'Usuário' }}</h2>
@@ -43,12 +69,8 @@
 
               <div class="info-block">
                 <label for="nome">Nome</label>
-
                 <div class="input-container">
-                  <span class="material-symbols-outlined">
-                    person
-                  </span>
-
+                  <span class="material-symbols-outlined">person</span>
                   <input
                     id="nome"
                     v-model="form.nome"
@@ -62,12 +84,8 @@
 
               <div class="info-block">
                 <label for="email">E-mail</label>
-
                 <div class="input-container">
-                  <span class="material-symbols-outlined">
-                    mail
-                  </span>
-
+                  <span class="material-symbols-outlined">mail</span>
                   <input
                     id="email"
                     v-model="form.email"
@@ -81,48 +99,29 @@
 
             </div>
 
-            <div
-              v-if="mensagem"
-              class="message success"
-            >
-              <span class="material-symbols-outlined">
-                check_circle
-              </span>
-
+            <div v-if="mensagem" class="message success">
+              <span class="material-symbols-outlined">check_circle</span>
               {{ mensagem }}
             </div>
 
-            <div
-              v-if="authStore.error"
-              class="message error"
-            >
-              <span class="material-symbols-outlined">
-                error
-              </span>
-
+            <div v-if="authStore.error" class="message error">
+              <span class="material-symbols-outlined">error</span>
               {{ authStore.error }}
             </div>
 
             <div class="actions">
-
               <template v-if="!editando">
-
                 <button
                   type="button"
                   class="edit-btn"
                   @click="iniciarEdicao"
                 >
-                  <span class="material-symbols-outlined">
-                    edit
-                  </span>
-
+                  <span class="material-symbols-outlined">edit</span>
                   Editar perfil
                 </button>
-
               </template>
 
               <template v-else>
-
                 <button
                   type="button"
                   class="cancel-btn"
@@ -137,23 +136,11 @@
                   class="save-btn"
                   :disabled="authStore.loading"
                 >
-                  <span
-                    v-if="authStore.loading"
-                    class="spinner"
-                  ></span>
-
-                  <span
-                    v-else
-                    class="material-symbols-outlined"
-                  >
-                    save
-                  </span>
-
+                  <span v-if="authStore.loading" class="spinner"></span>
+                  <span v-else class="material-symbols-outlined">save</span>
                   {{ authStore.loading ? 'Salvando...' : 'Salvar alterações' }}
                 </button>
-
               </template>
-
             </div>
 
           </form>
@@ -165,7 +152,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
@@ -173,65 +160,81 @@ const authStore = useAuthStore();
 const editando = ref(false);
 const mensagem = ref('');
 
+const fileInput = ref(null);
+const fotoArquivo = ref(null);
+const previewFoto = ref(null);
+
 const form = reactive({
   nome: '',
   email: ''
 });
 
-const usuarioAtual = computed(() => {
-  return authStore.usuario || {};
-});
+const usuarioAtual = computed(() => authStore.usuario || {});
 
 const inicialUsuario = computed(() => {
-  const nome =
-    usuarioAtual.value.nome ||
-    usuarioAtual.value.name ||
-    'U';
-
+  const nome = usuarioAtual.value.nome || usuarioAtual.value.name || 'U';
   return nome.charAt(0).toUpperCase();
 });
 
 function preencherFormulario() {
-  form.nome =
-    usuarioAtual.value.nome ||
-    usuarioAtual.value.name ||
-    '';
+  form.nome = usuarioAtual.value.nome || usuarioAtual.value.name || '';
+  form.email = usuarioAtual.value.email || '';
+}
 
-  form.email =
-    usuarioAtual.value.email ||
-    '';
+function limparPreviewFoto() {
+  if (previewFoto.value) {
+    URL.revokeObjectURL(previewFoto.value);
+    previewFoto.value = null;
+  }
+  fotoArquivo.value = null;
+  if (fileInput.value) {
+    fileInput.value.value = '';
+  }
+}
+
+function acionarInputFoto() {
+  if (fileInput.value) {
+    fileInput.value.click();
+  }
+}
+
+function aoSelecionarFoto(event) {
+  const arquivo = event.target.files[0];
+  if (arquivo) {
+    limparPreviewFoto();
+    fotoArquivo.value = arquivo;
+    previewFoto.value = URL.createObjectURL(arquivo);
+  }
 }
 
 function iniciarEdicao() {
   mensagem.value = '';
-  authStore.error = null;
-
+  if (authStore.error) authStore.error = null;
   preencherFormulario();
-
   editando.value = true;
 }
 
 function cancelarEdicao() {
   preencherFormulario();
-
   mensagem.value = '';
-  authStore.error = null;
-
+  if (authStore.error) authStore.error = null;
+  limparPreviewFoto();
   editando.value = false;
 }
 
 async function salvarPerfil() {
   mensagem.value = '';
-  authStore.error = null;
+  if (authStore.error) authStore.error = null;
 
   const sucesso = await authStore.updateProfile({
     nome: form.nome.trim(),
-    email: form.email.trim()
+    email: form.email.trim(),
+    foto: fotoArquivo.value
   });
 
   if (sucesso) {
     editando.value = false;
-
+    limparPreviewFoto();
     mensagem.value = 'Perfil atualizado com sucesso!';
 
     setTimeout(() => {
@@ -240,11 +243,16 @@ async function salvarPerfil() {
   }
 }
 
+watch(usuarioAtual, () => {
+  if (!editando.value) {
+    preencherFormulario();
+  }
+}, { immediate: true });
+
 onMounted(async () => {
   if (!authStore.usuario && authStore.token) {
     await authStore.me();
   }
-
   preencherFormulario();
 });
 </script>
@@ -298,11 +306,28 @@ onMounted(async () => {
   gap: 15px;
 }
 
-.avatar {
+.avatar-container {
+  position: relative;
   width: 65px;
   height: 65px;
   min-width: 65px;
   border-radius: 50%;
+  overflow: hidden;
+}
+
+.avatar-container.editable {
+  cursor: pointer;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
   background-color: #90caf9;
   color: #333;
   display: flex;
@@ -310,6 +335,25 @@ onMounted(async () => {
   justify-content: center;
   font-size: 1.5rem;
   font-weight: 700;
+}
+
+.avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.avatar-container.editable:hover .avatar-overlay {
+  opacity: 1;
 }
 
 .profile-name {
@@ -566,10 +610,13 @@ button:disabled {
     gap: 18px;
   }
 
-  .avatar {
+  .avatar-container {
     width: 75px;
     height: 75px;
     min-width: 75px;
+  }
+
+  .avatar {
     font-size: 1.7rem;
   }
 }
@@ -584,4 +631,3 @@ button:disabled {
   }
 }
 </style>
-```

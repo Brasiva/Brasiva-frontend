@@ -1,98 +1,153 @@
 <template>
   <div class="page-layout">
     <div class="main-content">
-
-      <Header />
-
       <div class="page-body">
 
-        <!-- Banner Dinâmico com dados do Usuário e Data Atual -->
-        <div class="welcome-banner">
-          <h2>Bem vindo novamente, {{ authStore.usuario?.name || 'Usuário' }}</h2>
-          <p>{{ dataFormatada }}</p>
-        </div>
-
-        <!-- 4 Cards de Métricas -->
-        <div class="metrics-grid">
-          <div class="metric-card">
-            <div class="metric-icon">📅</div>
-            <div class="metric-value orange-text">{{ appStore.eventos.length }}</div>
-            <div class="metric-label">Eventos esse mês</div>
+        <section class="welcome-card">
+          <div>
+            <span class="welcome-label">Bem-vindo ao BRASIVA</span>
+            <h1>Olá, {{ nomeUsuario }}!</h1>
+            <p>Confira o resumo do gerenciamento do seu negócio.</p>
           </div>
 
-          <div class="metric-card">
-            <div class="metric-icon">📦</div>
-            <div class="metric-value orange-text">32</div>
-            <div class="metric-label">Itens em estoque</div>
-          </div>
+          <span class="material-symbols-outlined welcome-icon">
+            dashboard
+          </span>
+        </section>
+
+        <section class="metrics-grid">
 
           <div class="metric-card">
-            <div class="metric-icon">👥</div>
-            <div class="metric-value orange-text">12</div>
-            <div class="metric-label">Funcionários</div>
+            <div class="metric-icon orange">
+              <span class="material-symbols-outlined">
+                inventory_2
+              </span>
+            </div>
+
+            <div class="metric-content">
+              <small>Estoque baixo</small>
+              <strong>{{ appStore.itensEstoqueBaixo }}</strong>
+              <span>itens precisam de atenção</span>
+            </div>
           </div>
 
           <div class="metric-card">
-            <div class="metric-icon">💰</div>
-            <div class="metric-value orange-text">R$ 8.450</div>
-            <div class="metric-label">Saldo do mês</div>
+            <div class="metric-icon blue">
+              <span class="material-symbols-outlined">
+                shopping_cart
+              </span>
+            </div>
+
+            <div class="metric-content">
+              <small>Pedidos pendentes</small>
+              <strong>{{ appStore.pedidosPendentes }}</strong>
+              <span>pedidos aguardando aceite</span>
+            </div>
           </div>
-        </div>
 
-        <!-- Seção de Pedidos Disponíveis -->
-        <div class="section-header">
-          <h3>Pedidos disponíveis</h3>
-          <div class="actions">
-            <button class="btn-orange" @click="$router.push('/pedidos')">Ver todos</button>
-            <button class="btn-filter">Filtrar ∧</button>
+          <div class="metric-card">
+            <div class="metric-icon green">
+              <span class="material-symbols-outlined">
+                event
+              </span>
+            </div>
+
+            <div class="metric-content">
+              <small>Eventos</small>
+              <strong>{{ appStore.eventosAgendados }}</strong>
+              <span>eventos agendados</span>
+            </div>
           </div>
-        </div>
 
-        <!-- Grid de Cards de Pedidos sem cor pastel -->
-        <div class="pedidos-grid">
-          <div v-for="pedido in appStore.pedidos" :key="pedido.id" class="pedido-card">
-
-            <div class="client-header">
-              <img :src="pedido.fotoCliente" class="client-avatar" alt="Avatar Cliente" />
-              <div>
-                <strong>{{ pedido.cliente }}</strong>
-                <small>{{ pedido.dataPedido }}</small>
-              </div>
+          <div class="metric-card">
+            <div class="metric-icon purple">
+              <span class="material-symbols-outlined">
+                groups
+              </span>
             </div>
 
-            <div class="info-box full">
-              <small>$ Valor do orçamento</small>
-              <strong>{{ pedido.orcamento }}</strong>
+            <div class="metric-content">
+              <small>Funcionários</small>
+              <strong>{{ totalFuncionarios }}</strong>
+              <span>funcionários cadastrados</span>
+            </div>
+          </div>
+
+        </section>
+
+        <section class="home-section">
+          <div class="section-header">
+            <div>
+              <span class="section-label">Pedidos</span>
+              <h2>Pedidos disponíveis</h2>
             </div>
 
-            <div class="info-row">
-              <div class="info-box">
-                <small>✓ Tipo</small>
-                <span>{{ pedido.tipo }}</span>
-              </div>
-              <div class="info-box">
-                <small>🕒 Data e hora</small>
-                <span>{{ pedido.dataHora }}</span>
-              </div>
-            </div>
-
-            <div class="info-row">
-              <div class="info-box">
-                <small>👥 Número de pessoas</small>
-                <span>{{ pedido.pessoas }}</span>
-              </div>
-              <div class="info-box">
-                <small>📍 Endereço</small>
-                <span>{{ pedido.endereco }}</span>
-              </div>
-            </div>
-
-            <button class="btn-acessar" @click="$router.push('/pedidos')">
-              Acessar Pedido ➔
+            <button class="view-button" @click="$router.push('/pedidos')">
+              Ver todos
+              <span class="material-symbols-outlined">
+                arrow_forward
+              </span>
             </button>
-
           </div>
-        </div>
+
+          <div v-if="pedidosRecentes.length" class="cards-grid">
+            <div
+              v-for="pedido in pedidosRecentes"
+              :key="pedido.id"
+              class="pedido-card"
+            >
+              <div class="card-header">
+                <div>
+                  <span class="card-id">#{{ pedido.id }}</span>
+                  <h3>{{ pedido.tipo }}</h3>
+                </div>
+
+                <span
+                  class="status-dot"
+                  :style="{
+                    backgroundColor: appStore.getCorEvento(pedido.tipo)
+                  }"
+                ></span>
+              </div>
+
+              <div class="info-block">
+                <small>Cliente</small>
+                <span>{{ pedido.cliente }}</span>
+              </div>
+
+              <div class="info-row">
+                <div class="info-block">
+                  <small>Pessoas</small>
+                  <span>{{ pedido.pessoas }}</span>
+                </div>
+
+                <div class="info-block">
+                  <small>Data</small>
+                  <span>{{ formatarData(pedido.dataHora) }}</span>
+                </div>
+              </div>
+
+              <div class="info-block">
+                <small>Valor do orçamento</small>
+                <strong>{{ pedido.orcamento }}</strong>
+              </div>
+
+              <button
+                class="card-button"
+                @click="$router.push('/pedidos')"
+              >
+                Acessar pedido
+              </button>
+            </div>
+          </div>
+
+          <div v-else class="empty-state">
+            <span class="material-symbols-outlined">
+              shopping_cart
+            </span>
+            <p>Nenhum pedido pendente.</p>
+          </div>
+        </section>
 
       </div>
     </div>
@@ -100,464 +155,335 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { useAppStore } from '@/stores/appStore.js';
-import { useAuthStore } from "@/stores/auth.js";
-import Header from '@/components/Header.vue';
+import { computed, onMounted } from 'vue'
+import { useAppStore } from '@/stores/appStore.js'
+import { useFuncionarioStore } from '@/stores/funcionarios'
 
-const appStore = useAppStore();
-const authStore = useAuthStore();
+const appStore = useAppStore()
+const funcionarioStore = useFuncionarioStore()
 
-// Formata a data atual em português (ex: quinta-feira, 16 de julho de 2026)
-const dataFormatada = computed(() => {
-  const opcoes = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-  return new Date().toLocaleDateString('pt-BR', opcoes);
-});
+const nomeUsuario = computed(() => {
+  try {
+    const usuario = JSON.parse(
+      localStorage.getItem('usuario') || '{}'
+    )
+
+    return (
+      usuario.nome ||
+      usuario.first_name ||
+      usuario.username ||
+      'usuário'
+    )
+  } catch {
+    return 'usuário'
+  }
+})
+
+const pedidosRecentes = computed(() => {
+  return appStore.pedidos.slice(0, 3)
+})
+
+const totalFuncionarios = computed(() => {
+  return funcionarioStore.funcionarios?.length || 0
+})
+
+onMounted(async () => {
+  await funcionarioStore.buscarFuncionarios()
+})
+
+function formatarData(dataHora) {
+  return dataHora?.split(' ')[0] || ''
+}
 </script>
+
 <style scoped>
 .page-layout {
-  display: flex;
-  width: 100%;
-  min-width: 0;
   min-height: 100vh;
-  background-color: #f4f5f7;
+  background: #f4f5f7;
   font-family: 'Poppins', sans-serif;
-  color: #333;
-  overflow-x: hidden;
 }
 
 .main-content {
-  flex: 1;
-  width: 100%;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  overflow-x: hidden;
+  min-height: 100vh;
 }
 
 .page-body {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-  padding: 16px 14px 35px;
+  padding: 28px 35px;
+  max-width: 1450px;
+  margin: 0 auto;
 }
 
-/* ================= BANNER ================= */
-
-.welcome-banner {
-  width: 100%;
-  min-width: 0;
-  min-height: 130px;
-  box-sizing: border-box;
-  padding: 20px;
-  margin-bottom: 18px;
-  border-radius: 15px;
-  background: #c2c5c8;
-  color: #fff;
+.welcome-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px 28px;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  border: 1px solid #eee;
 }
 
-.welcome-banner h2 {
-  margin: 0;
-  font-size: 1.15rem;
+.welcome-label {
+  font-size: .72rem;
+  color: #ff9500;
   font-weight: 700;
-  line-height: 1.4;
-  overflow-wrap: break-word;
+  text-transform: uppercase;
 }
 
-.welcome-banner p {
-  margin: 6px 0 0;
-  font-size: 0.75rem;
-  opacity: 0.9;
-  text-transform: capitalize;
+.welcome-card h1 {
+  margin: 4px 0;
+  font-size: 1.45rem;
+  color: #333;
 }
 
-/* ================= MÉTRICAS ================= */
+.welcome-card p {
+  margin: 0;
+  color: #888;
+  font-size: .78rem;
+}
+
+.welcome-icon {
+  font-size: 42px;
+  color: #ff9500;
+}
 
 .metrics-grid {
-  width: 100%;
-  min-width: 0;
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 30px;
 }
 
 .metric-card {
-  min-width: 0;
-  box-sizing: border-box;
-  background-color: #fff;
-  padding: 16px;
-  border-radius: 15px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.metric-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 14px;
+  padding: 17px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
 }
 
 .metric-icon {
-  width: 36px;
-  height: 36px;
-  margin-bottom: 9px;
-  border-radius: 10px;
-  background-color: #fff3e0;
+  width: 43px;
+  height: 43px;
+  border-radius: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
 }
 
-.metric-value {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #ff8a00;
-  line-height: 1.2;
-  overflow-wrap: break-word;
+.metric-icon.orange {
+  background: #fff1df;
+  color: #ff9500;
 }
 
-.metric-label {
-  margin-top: 5px;
-  color: #888;
-  font-size: 0.72rem;
-  font-weight: 500;
+.metric-icon.blue {
+  background: #eaf4ff;
+  color: #4689c8;
 }
 
-/* ================= PEDIDOS HEADER ================= */
+.metric-icon.green {
+  background: #edf8ef;
+  color: #4f9b59;
+}
 
-.section-header {
-  width: 100%;
-  min-width: 0;
+.metric-icon.purple {
+  background: #f2edff;
+  color: #8064c7;
+}
+
+.metric-icon span {
+  font-size: 22px;
+}
+
+.metric-content {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 12px;
+}
+
+.metric-content small {
+  color: #888;
+  font-size: .68rem;
+}
+
+.metric-content strong {
+  color: #333;
+  font-size: 1.25rem;
+}
+
+.metric-content span {
+  color: #aaa;
+  font-size: .62rem;
+}
+
+.home-section {
+  background: transparent;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 15px;
 }
 
-.section-header h3 {
-  margin: 0;
-  color: #333;
-  font-size: 1rem;
+.section-label {
+  color: #ff9500;
+  font-size: .68rem;
   font-weight: 700;
+  text-transform: uppercase;
 }
 
-.actions {
-  width: 100%;
+.section-header h2 {
+  margin: 2px 0 0;
+  color: #333;
+  font-size: 1.15rem;
+}
+
+.view-button {
+  border: 0;
+  background: transparent;
+  color: #ff9500;
   display: flex;
-  gap: 8px;
-}
-
-.btn-orange,
-.btn-filter {
-  flex: 1;
-  min-width: 0;
-  min-height: 36px;
-  box-sizing: border-box;
-  border-radius: 9px;
-  padding: 7px 10px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 0.72rem;
-  font-weight: 600;
+  align-items: center;
+  gap: 4px;
   cursor: pointer;
-  transition: 0.2s ease;
+  font-size: .72rem;
+  font-weight: 600;
 }
 
-.btn-orange {
-  border: none;
-  background-color: #ff8a00;
-  color: #fff;
+.view-button span {
+  font-size: 17px;
 }
 
-.btn-orange:hover {
-  background-color: #e87d00;
-}
-
-.btn-filter {
-  background-color: #fff;
-  border: 1px solid #e0e0e0;
-  color: #666;
-}
-
-.btn-filter:hover {
-  background-color: #f8f8f8;
-}
-
-/* ================= GRID PEDIDOS ================= */
-
-.pedidos-grid {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
+.cards-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 14px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
 }
 
 .pedido-card {
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-  background-color: #fff;
-  padding: 15px;
-  border-radius: 15px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  overflow: hidden;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 14px;
+  padding: 17px;
+  transition: .2s;
 }
 
 .pedido-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 5px 18px rgba(0, 0, 0, .06);
 }
 
-/* ================= CLIENTE ================= */
-
-.client-header {
-  min-width: 0;
+.card-header {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 13px;
 }
 
-.client-avatar {
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
+.card-id {
+  font-size: .65rem;
+  color: #999;
+}
+
+.card-header h3 {
+  margin: 1px 0 0;
+  font-size: .92rem;
+  color: #333;
+}
+
+.status-dot {
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
-  object-fit: cover;
-  background-color: #f1f1f1;
 }
 
-.client-header > div {
-  min-width: 0;
-}
-
-.client-header strong {
-  display: block;
-  color: #333;
-  font-size: 0.85rem;
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.client-header small {
-  display: block;
-  margin-top: 2px;
-  color: #999;
-  font-size: 0.68rem;
-}
-
-/* ================= INFORMAÇÕES ================= */
-
-.info-box {
-  flex: 1;
-  min-width: 0;
-  box-sizing: border-box;
-  padding: 9px 10px;
-  border-radius: 9px;
-  background-color: #f9f9f9;
-  overflow: hidden;
-}
-
-.info-box.full {
-  width: 100%;
-  margin-bottom: 8px;
-}
-
-.info-box small {
-  display: block;
-  margin-bottom: 3px;
-  color: #999;
-  font-size: 0.63rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.info-box span,
-.info-box strong {
-  display: block;
-  color: #333;
-  font-size: 0.74rem;
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.info-block {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 7px;
 }
 
 .info-row {
-  width: 100%;
-  min-width: 0;
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
 }
 
-/* ================= BOTÃO ACESSAR ================= */
+.info-block small {
+  display: block;
+  color: #999;
+  font-size: .58rem;
+  margin-bottom: 2px;
+}
 
-.btn-acessar {
+.info-block span,
+.info-block strong {
+  color: #444;
+  font-size: .73rem;
+}
+
+.card-button {
   width: 100%;
-  min-height: 38px;
-  box-sizing: border-box;
-  margin-top: 5px;
-  padding: 9px 12px;
-  border: none;
-  border-radius: 9px;
-  background-color: #ff8a00;
+  border: 0;
+  background: #333;
   color: #fff;
-  font-family: 'Poppins', sans-serif;
-  font-size: 0.75rem;
+  border-radius: 8px;
+  padding: 9px;
+  margin-top: 5px;
+  font-size: .7rem;
   font-weight: 600;
   cursor: pointer;
-  transition: 0.2s ease;
 }
 
-.btn-acessar:hover {
-  background-color: #e87d00;
+.empty-state {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 14px;
+  padding: 40px;
+  text-align: center;
+  color: #999;
 }
 
-/* ================= TEMA ESCURO ================= */
-
-:global(html.dark-mode) .page-layout {
-  background-color: #181a1b;
+.empty-state span {
+  font-size: 30px;
+  color: #ccc;
 }
 
-:global(html.dark-mode) .metric-card,
-:global(html.dark-mode) .pedido-card {
-  background-color: #222526;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+.empty-state p {
+  font-size: .75rem;
 }
 
-:global(html.dark-mode) .metric-label,
-:global(html.dark-mode) .section-header h3,
-:global(html.dark-mode) .client-header strong {
-  color: #eeeeee;
-}
-
-:global(html.dark-mode) .btn-filter {
-  background-color: #2b2e30;
-  border-color: #45494c;
-  color: #eeeeee;
-}
-
-:global(html.dark-mode) .info-box {
-  background-color: #2b2e30;
-}
-
-:global(html.dark-mode) .info-box span,
-:global(html.dark-mode) .info-box strong {
-  color: #eeeeee;
-}
-
-/* ================= TABLET ================= */
-
-@media (min-width: 600px) {
-  .page-body {
-    padding: 25px 30px 40px;
-  }
-
-  .welcome-banner {
-    min-height: 145px;
-    padding: 25px;
-  }
-
-  .welcome-banner h2 {
-    font-size: 1.3rem;
-  }
-
+@media (max-width: 1100px) {
   .metrics-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .section-header {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .actions {
-    width: auto;
-  }
-
-  .btn-orange,
-  .btn-filter {
-    flex: none;
-    min-width: 90px;
-  }
-
-  .pedidos-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* ================= DESKTOP ================= */
-
-@media (min-width: 768px) {
+@media (max-width: 700px) {
   .page-body {
-    padding: 30px;
+    padding: 20px 15px;
   }
 
-  .welcome-banner {
-    min-height: 155px;
-    padding: 28px;
+  .metrics-grid,
+  .cards-grid {
+    grid-template-columns: 1fr;
   }
 
-  .welcome-banner h2 {
-    font-size: 1.45rem;
+  .welcome-card {
+    padding: 18px;
   }
 
-  .welcome-banner p {
-    font-size: 0.82rem;
-  }
-
-  .metric-card {
-    padding: 20px;
-  }
-
-  .metric-value {
-    font-size: 1.6rem;
-  }
-
-  .pedidos-grid {
-    gap: 20px;
-  }
-}
-
-/* ================= DESKTOP GRANDE ================= */
-
-@media (min-width: 1024px) {
-  .page-body {
-    padding: 30px 40px;
-  }
-
-  .metrics-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 20px;
-  }
-
-  .pedidos-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 20px;
-  }
-
-  .welcome-banner {
-    min-height: 150px;
-  }
-
-  .welcome-banner h2 {
-    font-size: 1.6rem;
+  .welcome-icon {
+    display: none;
   }
 }
 </style>

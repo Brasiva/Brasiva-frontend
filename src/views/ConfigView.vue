@@ -9,22 +9,18 @@
             Personalize sua experiência no BRASIVA
           </p>
         </div>
-
         <div class="settings-card">
-
           <div class="section-header">
             <div class="section-icon">
               <span class="material-symbols-outlined">
                 palette
               </span>
             </div>
-
             <div>
               <h3>Aparência</h3>
               <p>Escolha como o BRASIVA será exibido</p>
             </div>
           </div>
-
           <div class="setting-item">
             <div class="setting-info">
               <div class="setting-icon">
@@ -32,10 +28,8 @@
                   {{ temaEscuro ? 'dark_mode' : 'light_mode' }}
                 </span>
               </div>
-
               <div>
                 <strong>Tema escuro</strong>
-
                 <small>
                   {{
                     temaEscuro
@@ -45,7 +39,6 @@
                 </small>
               </div>
             </div>
-
             <button
               type="button"
               class="toggle"
@@ -60,22 +53,18 @@
               <span class="toggle-circle"></span>
             </button>
           </div>
-
           <div class="divider"></div>
-
           <div class="section-header">
             <div class="section-icon">
               <span class="material-symbols-outlined">
                 notifications
               </span>
             </div>
-
             <div>
               <h3>Notificações</h3>
               <p>Controle suas preferências de notificações</p>
             </div>
           </div>
-
           <div class="setting-item">
             <div class="setting-info">
               <div class="setting-icon">
@@ -83,16 +72,13 @@
                   notifications_active
                 </span>
               </div>
-
               <div>
                 <strong>Notificações</strong>
-
                 <small>
                   Receber notificações do sistema
                 </small>
               </div>
             </div>
-
             <button
               type="button"
               class="toggle"
@@ -102,40 +88,32 @@
               <span class="toggle-circle"></span>
             </button>
           </div>
-
           <div class="divider"></div>
-
           <div class="section-header">
             <div class="section-icon">
               <span class="material-symbols-outlined">
                 info
               </span>
             </div>
-
             <div>
               <h3>Sobre</h3>
               <p>Informações sobre o sistema</p>
             </div>
           </div>
-
           <div class="about-box">
             <div>
               <strong>BRASIVA</strong>
               <span>Sistema de gerenciamento</span>
             </div>
-
             <span class="version">
               Versão 1.0.0
             </span>
           </div>
-
         </div>
-
       </div>
     </div>
   </div>
 </template>
-
 <script setup>
 import { onMounted, ref, watch } from 'vue';
 
@@ -160,9 +138,16 @@ function alternarTema() {
 }
 
 onMounted(() => {
-  temaEscuro.value = localStorage.getItem('tema') === 'escuro';
+  // 1. Apenas lê se a chave existe e é igual a 'escuro'
+  const temaSalvo = localStorage.getItem('tema');
 
-  aplicarTema();
+  if (temaSalvo === 'escuro') {
+    temaEscuro.value = true;
+    document.documentElement.classList.add('dark-mode');
+  } else {
+    temaEscuro.value = false;
+    document.documentElement.classList.remove('dark-mode');
+  }
 
   notificacoes.value =
     localStorage.getItem('notificacoes') !== 'desativadas';
@@ -175,7 +160,6 @@ watch(notificacoes, (valor) => {
   );
 });
 </script>
-
 <style scoped>
 .page-layout {
   display: flex;
