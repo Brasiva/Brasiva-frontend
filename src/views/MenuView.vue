@@ -51,14 +51,13 @@
           </ul>
           <!-- AÇÕES -->
           <div class="acoes-detalhe">
-            <button @click="fecharDetalhes" class="btn-fechar-detalhe" > Fechar </button> <button @click="deletarPrato(pratoSelecionadoId.id)" class="btn-deletar-prato" > Excluir Prato </button>
+            <button @click="fecharDetalhes" class="btn-fechar-detalhe" > Fechar </button>
+            <button @click="deletarPrato(pratoSelecionado.id)" class="btn-deletar-prato" > Excluir Prato </button>
           </div>
         </div>
       </div>
     </div>
-    <!-- ================================================= -->
     <!-- MODAL DE NOVO PRATO -->
-    <!-- ================================================= -->
     <div v-if="exibirModal" class="modal-overlay" @click.self="exibirModal = false" >
       <div class="modal-card">
         <h3>+ NOVO PRATO -</h3>
@@ -109,50 +108,35 @@
   </div>
 </template>
 
+```vue
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { useCardapioStore } from '@/stores/cardapio';
 
-// Dados estáticos de exemplo para a apresentação
-const listaPratos = ref([
-  {
-    id: 1,
-    nome: 'Salmão Grelhado',
-    preco: 65.00,
-    categoria: 'Prato Principal',
-    modoFazer: 'Grelhar o salmão na chapa por 5 minutos de cada lado com azeite e ervas finas.',
-    ingredientes: ['Filé de Salmão', 'Azeite', 'Alecrim', 'Sal']
-  },
-  {
-    id: 2,
-    nome: 'Feijoada Completa',
-    preco: 45.00,
-    categoria: 'Prato Principal',
-    modoFazer: 'Cozinhar o feijão com as carnes salgadas previamente dessalgadas por 3 horas.',
-    ingredientes: ['Feijão Preto', 'Carne de Porco', 'Linguiça', 'Louro']
-  },
-  {
-    id: 3,
-    nome: 'Pudim de Leite',
-    preco: 15.00,
-    categoria: 'Sobremesa',
-    modoFazer: 'Bater os ingredientes no liquidificador e assar em banho-maria com calda de açúcar.',
-    ingredientes: ['Leite Condensado', 'Leite', 'Ovos', 'Açúcar']
-  }
-]);
+// STORE DO CARDÁPIO
 
-// Opções estáticas para simular o estoque no preenchimento do formulário
-const listaMockEstoque = ref([
-  'Filé de Salmão', 'Feijão Preto', 'Arroz Branco', 'Batata', 'Ovos', 'Leite Condensado', 'Carne Moída', 'Frango'
-]);
 
-// Controle dos estados de tela
+const cardapioStore = useCardapioStore();
+// A lista de pratos agora vem da store
+const listaPratos = computed(() => cardapioStore.pratos);
+
+// CONTROLE DO PRATO SELECIONADO
+
+// Guarda apenas o ID do prato selecionado
 const pratoSelecionadoId = ref(null);
+
+// Busca o prato completo usando o ID
 const pratoSelecionado = computed(() => {
   return listaPratos.value.find(
     prato => prato.id === pratoSelecionadoId.value
   );
 });
+
+// CONTROLE DOS MODAIS
+
 const exibirModal = ref(false);
+
+// FORMULÁRIO DE NOVO PRATO
 
 const formPrato = ref({
   nome: '',
@@ -161,15 +145,42 @@ const formPrato = ref({
   modoFazer: '',
   ingredientesSelecionados: []
 });
-// Abrir detalhes
+
+// ESTOQUE
+
+// Por enquanto continua estático.
+// Depois podemos vincular isso ao estoque do banco.
+const listaMockEstoque = ref([
+  'Filé de Salmão',
+  'Feijão Preto',
+  'Arroz Branco',
+  'Batata',
+  'Ovos',
+  'Leite Condensado',
+  'Carne Moída',
+  'Frango'
+]);
+
+// CARREGAR PRATOS
+
+onMounted(async () => {
+  await cardapioStore.buscarPratosDoServidor();
+});
+
+// ABRIR DETALHES
+
 const selecionarPrato = (id) => {
   pratoSelecionadoId.value = id;
 };
-//Fechar detalhes
+
+// FECHAR DETALHES
+
 const fecharDetalhes = () => {
   pratoSelecionadoId.value = null;
 };
-//Abrir modal de novo prato
+
+// ABRIR MODAL DE NOVO PRATO
+
 const abrirModalNovoPrato = () => {
   formPrato.value = {
     nome: '',
@@ -180,28 +191,32 @@ const abrirModalNovoPrato = () => {
   };
   exibirModal.value = true;
 };
-// Salvar novo prato
-const salvarNovoPrato = () => {
-  // Cria e adiciona o prato localmente na lista da tela
-  listaPratos.value.push({
-    id: Date.now(),
+
+// SALVAR NOVO PRATO
+
+const salvarNovoPrato = async () => {
+  const novoPrato = {
     nome: formPrato.value.nome,
     preco: Number(formPrato.value.preco) || 0,
     categoria: formPrato.value.categoria,
     modoFazer: formPrato.value.modoFazer,
     ingredientes: [...formPrato.value.ingredientesSelecionados]
-  });
-  
+  };
+  await cardapioStore.adicionarPrato(novoPrato);
   exibirModal.value = false;
 };
-//Deletar prato
-const deletarPrato = (id) => {
-  if (confirm("Tem certeza que deseja remover este prato?")) {
-    listaPratos.value = listaPratos.value.filter(p => p.id !== id);
+
+// DELETAR PRATO
+
+const deletarPrato = async (id) => {
+  if (confirm('Tem certeza que deseja remover este prato?')) {
+    await cardapioStore.removerPrato(id);
     pratoSelecionadoId.value = null;
   }
 };
 </script>
+```
+
 
 <style scoped>
 /*PÁGINA*/
