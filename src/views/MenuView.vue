@@ -60,7 +60,7 @@
     <!-- MODAL DE NOVO PRATO -->
     <div v-if="exibirModal" class="modal-overlay" @click.self="exibirModal = false" >
       <div class="modal-card">
-        <h3>+ NOVO PRATO -</h3>
+        <h3> NOVO PRATO </h3>
         <form @submit.prevent="salvarNovoPrato" class="modal-form" >
           <!-- NOME -->
           <div class="form-group">
@@ -339,36 +339,41 @@ const deletarPrato = async (id) => {
 } 
 /*MODAL DE DETALHES*/ 
 .modal-detalhe-prato { 
-  position: relative;
-  z-index: 100000;
-  background-color: #FF9500;
-  color: white;
-  border-radius: 16px;
-  padding: 1.5rem;
-  width: 92%;
-  max-width: 750px;
-  max-height: 85vh;
+  width: 445px;
+  max-width: 92%;
+  padding: 1rem;
+  max-height: 90vh;
+  background-color: #ffffff;
+  color: #000;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
   overflow-y: auto;
   box-sizing: border-box;
 
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
 } 
 /*IMAGEM DETALHADA*/ 
 .placeholder-imagem-detalhe { 
+  width: 100%;
   height: 180px; 
   background-color: rgba(255, 255, 255, 0.2); 
   border-radius: 10px; 
   display: flex; 
   align-items: center; 
-  justify-content: center; 
-} 
+  justify-content: center;
+  box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
 .placeholder-imagem-detalhe i { 
   font-size: 90px; 
-  color: white; 
+  color: rgb(35, 35, 35); 
 } 
 /*MODO DE FAZER*/ 
+.modo-fazer-container {
+  width: 100%;
+}
 .modo-fazer-container h5 { 
   margin: 0.8rem 0 0.3rem 0; 
   text-decoration: underline; 
@@ -377,14 +382,15 @@ const deletarPrato = async (id) => {
 .modo-fazer-container p { 
   font-size: 0.8rem; 
   line-height: 1.4; 
-  margin: 0; 
-} 
+  margin: 0 0 1.2rem 0; 
+}
 /*COLUNAS*/ 
 .detalhe-coluna-esquerda { 
   width: 100%; 
 } 
 .detalhe-coluna-direita { 
-  width: 100%; 
+  width: 100%;
+  padding-left: 0;
 } 
 /*TÍTULO DO DETALHE*/ 
 .topo-detalhe-titulo { 
@@ -402,10 +408,10 @@ const deletarPrato = async (id) => {
 } 
 /*PREÇO*/ 
 .preco-tag { 
-  background: white; 
-  color: #FF9500; 
-  padding: 0.2rem 0.6rem; 
-  border-radius: 12px; 
+  background: #FF9500; 
+  color: #000000; 
+  padding: 0.4rem 0.8rem; 
+  border-radius: 10px; 
   font-weight: 600; 
   font-size: 0.9rem; 
   white-space: nowrap; 
@@ -440,44 +446,52 @@ const deletarPrato = async (id) => {
   margin-top: 1.5rem; 
 } 
 .btn-fechar-detalhe { 
-  background: white; 
-  color: #FF9500; 
+  background: #FF9500; 
+  color: #ffffff; 
   border: none; 
-  padding: 0.4rem 1rem; 
-  border-radius: 12px; 
-  font-weight: bold; 
+  padding: 0.4rem 0.8rem; 
+  border-radius: 7px;
   cursor: pointer; 
 } 
 .btn-deletar-prato { 
-  background: none; 
+  background-color: #bc160a; 
   border: none; 
-  color: #ffeef0; 
-  text-decoration: underline; 
+  color: #ffffff;
+  padding: 0.4rem 0.8rem;
+  border-radius: 7px;
   font-size: 0.75rem; 
-  cursor: pointer; 
+  cursor: pointer;
 } 
 /*MODAL NOVO PRATO*/ 
-.modal-card { 
-  background: #FF9500; 
-  color: white; 
-  padding: 1.5rem; 
-  border-radius: 16px; 
-  width: 92%; 
-  max-width: 450px; 
-  max-height: 85vh; 
-  overflow-y: auto; 
-  box-sizing: border-box; 
+.modal-card {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  width: 92%;
+  max-width: 450px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-sizing: border-box;
 } 
-.modal-card h3 { 
+.modal-card h3 {
   text-align: center; 
   margin: 0 0 1rem 0; 
   font-size: 1.2rem; 
-} 
+}
+.modal-card label {
+  font-size: 0.8rem; 
+  color: #3a3a3a; 
+  margin: 0.5rem 0 1rem 0; 
+}
 .modal-form { 
   display: flex; 
   flex-direction: column; 
-  gap: 0.8rem; 
-} 
+  gap: 0.8rem;
+}
+.modal-card input {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+}
 /*FORMULÁRIO*/ 
 .form-row { 
   display: grid; 
@@ -493,17 +507,18 @@ const deletarPrato = async (id) => {
   font-weight: bold; 
   margin-bottom: 0.2rem; 
 } 
-.form-group input, .form-group select, .form-group textarea { 
+.form-group input, .form-group select,  .form-group textarea { 
   border-radius: 6px; 
   border: none; 
   padding: 0.5rem; 
   font-family: inherit; 
   font-size: 0.85rem; 
-  box-sizing: border-box; 
+  box-sizing: border-box;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
 } 
 /*ESTOQUE*/ 
 .estoque-checkbox-scroll { 
-  background: white; 
   color: #000; 
   border-radius: 6px; 
   max-height: 100px; 
@@ -511,7 +526,9 @@ const deletarPrato = async (id) => {
   padding: 0.5rem; 
   display: flex; 
   flex-direction: column; 
-  gap: 0.3rem; 
+  gap: 0.3rem;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
 } 
 .checkbox-item { 
   display: flex; 
@@ -528,33 +545,22 @@ const deletarPrato = async (id) => {
   gap: 1rem; 
 } 
 .btn-modal-voltar { 
-  background: none; 
+  background: #FF9500; 
   border: none; 
-  color: white; 
+  color: #000000;
+  padding: 0.4rem 0.8rem; 
+  border-radius: 20px;
   font-weight: bold; 
   cursor: pointer; 
 } 
 .btn-modal-salvar { 
-  background: white; 
-  color: #FF9500; 
+  background: #64b5f6; 
+  color: #000000; 
   border: none; 
   padding: 0.5rem 1rem; 
   border-radius: 20px; 
   font-weight: bold; 
   cursor: pointer; 
-} 
-/*DESKTOP*/ 
-@media (min-width: 768px) { 
-  .modal-detalhe-prato { 
-    flex-direction: row; 
-  } 
-  .detalhe-coluna-esquerda { 
-    width: 40%; 
-  } 
-  .detalhe-coluna-direita { 
-    width: 60%; 
-    padding-left: 1rem; 
-  } 
 } 
 /*MOBILE*/ 
 @media (max-width: 500px) { 
