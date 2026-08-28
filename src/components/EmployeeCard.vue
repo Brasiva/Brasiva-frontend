@@ -1,15 +1,12 @@
 <template>
   <div class="employee-card">
-
     <div class="card-header">
-
       <div class="employee-photo">
         <img
           v-if="fotoUrl"
           :src="fotoUrl"
           :alt="funcionario.nome"
         />
-
         <span
           v-else
           class="material-symbols-outlined"
@@ -17,32 +14,24 @@
           person
         </span>
       </div>
-
       <div class="employee-title">
         <h3>{{ funcionario.nome }}</h3>
         <span>{{ funcionario.cargo }}</span>
       </div>
-
     </div>
-
     <div class="info-block">
       <small>Telefone</small>
-
       <span>
         {{ funcionario.telefone || 'Não informado' }}
       </span>
     </div>
-
     <div class="info-block">
       <small>Pagamento</small>
-
       <strong>
         {{ formatarPagamento(funcionario.pagamento) }}
       </strong>
     </div>
-
     <div class="card-actions">
-
       <button
         class="edit-button"
         type="button"

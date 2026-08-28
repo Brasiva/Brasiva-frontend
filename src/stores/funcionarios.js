@@ -25,16 +25,23 @@ export const useFuncionarioStore = defineStore("funcionarios", {
   }),
 
   actions: {
-  
+    // ============================
+    // BUSCAR FUNCIONÁRIOS
+    // ============================
     async buscarFuncionarios() {
       this.carregando = true;
       this.erro = null;
 
       try {
         const resposta = await api.get("/funcionarios/");
-        this.funcionarios = resposta.data;
+
+        const lista = Array.isArray(resposta.data)
+          ? resposta.data
+          : (resposta.data.results || []);
+
+        this.funcionarios = lista;
       } catch (err) {
-        console.error(err);
+        console.error("Erro ao buscar funcionários:", err.response?.data || err);
         this.erro = "Erro ao carregar funcionários.";
       } finally {
         this.carregando = false;
@@ -51,13 +58,59 @@ export const useFuncionarioStore = defineStore("funcionarios", {
       formData.append("file", arquivo);
       formData.append("description", descricao);
 
-      const resposta = await api.post("/media/images/", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      try {
+        const resposta = await api.post("/media/images/", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
 
-      return resposta.data.attachment_key;
+        return resposta.data.attachment_key;
+      } catch (err) {
+        console.error("ERRO UPLOAD FOTO:", err.response?.data || err);
+        throw err;
+      }
+    },
+
+    // ============================
+    // HELPER: PREPARAR PAYLOAD
+    // ============================
+    prepararPayload(dadosForm, attachmentKey = null) {
+      // 1. Extrai apenas os números do telefone
+      const apenasNumeros = dadosForm.telefone
+        ? String(dadosForm.telefone).replace(/\D/g, "")
+        : "";
+
+      // 2. Formata para o padrão aceito pelo Django (E.164 com +55)
+      let telefoneFormatado = "";
+      if (apenasNumeros) {
+        if (apenasNumeros.length === 13 && apenasNumeros.startsWith("55")) {
+          telefoneFormatado = `+${apenasNumeros}`;
+        } else if (apenasNumeros.length === 10 || apenasNumeros.length === 11) {
+          telefoneFormatado = `+55${apenasNumeros}`;
+        } else {
+          telefoneFormatado = apenasNumeros;
+        }
+      }
+
+      // 3. Garante que pagamento seja enviado como número float/decimal
+      const pagamentoNumero = dadosForm.pagamento
+        ? parseFloat(String(dadosForm.pagamento).replace(",", "."))
+        : 0;
+
+      const payload = {
+        nome: dadosForm.nome,
+        cargo: dadosForm.cargo,
+        telefone: telefoneFormatado,
+        pagamento: pagamentoNumero,
+      };
+
+      // Inclui a foto apenas se houve upload bem-sucedido
+      if (attachmentKey) {
+        payload.foto_attachment_key = attachmentKey;
+      }
+
+      return payload;
     },
 
     // ============================
@@ -70,7 +123,6 @@ export const useFuncionarioStore = defineStore("funcionarios", {
       try {
         let attachmentKey = null;
 
-        // Upload da imagem primeiro
         if (dadosForm.foto instanceof File) {
           attachmentKey = await this.uploadFoto(
             dadosForm.foto,
@@ -78,24 +130,19 @@ export const useFuncionarioStore = defineStore("funcionarios", {
           );
         }
 
-        const payload = {
-          nome: dadosForm.nome,
-          cargo: dadosForm.cargo,
-          telefone: dadosForm.telefone,
-          pagamento: dadosForm.pagamento,
-        };
-
-        if (attachmentKey) {
-          payload.foto_attachment_key = attachmentKey;
-        }
+        const payload = this.prepararPayload(dadosForm, attachmentKey);
 
         const resposta = await api.post("/funcionarios/", payload);
 
-        this.funcionarios.push(resposta.data);
+        if (Array.isArray(this.funcionarios)) {
+          this.funcionarios.push(resposta.data);
+        } else {
+          await this.buscarFuncionarios();
+        }
 
         return resposta.data;
       } catch (err) {
-        console.error(err.response?.data || err);
+        console.error("DETALHES DO ERRO DA API (400):", err.response?.data);
 
         this.erro =
           err.response?.data ||
@@ -124,33 +171,28 @@ export const useFuncionarioStore = defineStore("funcionarios", {
           );
         }
 
-        const payload = {
-          nome: dadosForm.nome,
-          cargo: dadosForm.cargo,
-          telefone: dadosForm.telefone,
-          pagamento: dadosForm.pagamento,
-        };
-
-        if (attachmentKey) {
-          payload.foto_attachment_key = attachmentKey;
-        }
+        const payload = this.prepararPayload(dadosForm, attachmentKey);
 
         const resposta = await api.put(
           `/funcionarios/${id}/`,
           payload
         );
 
-        const index = this.funcionarios.findIndex(
-          (f) => f.id === id
-        );
+        if (Array.isArray(this.funcionarios)) {
+          const index = this.funcionarios.findIndex(
+            (f) => f.id === id
+          );
 
-        if (index !== -1) {
-          this.funcionarios[index] = resposta.data;
+          if (index !== -1) {
+            this.funcionarios[index] = resposta.data;
+          }
+        } else {
+          await this.buscarFuncionarios();
         }
 
         return resposta.data;
       } catch (err) {
-        console.error(err.response?.data || err);
+        console.error("DETALHES DO ERRO DA API (400):", err.response?.data);
 
         this.erro =
           err.response?.data ||
@@ -163,7 +205,7 @@ export const useFuncionarioStore = defineStore("funcionarios", {
     },
 
     // ============================
-    // REMOVER
+    // REMOVER FUNCIONÁRIO
     // ============================
     async removerFuncionario(id) {
       this.erro = null;
@@ -171,11 +213,13 @@ export const useFuncionarioStore = defineStore("funcionarios", {
       try {
         await api.delete(`/funcionarios/${id}/`);
 
-        this.funcionarios = this.funcionarios.filter(
-          (f) => f.id !== id
-        );
+        if (Array.isArray(this.funcionarios)) {
+          this.funcionarios = this.funcionarios.filter(
+            (f) => f.id !== id
+          );
+        }
       } catch (err) {
-        console.error(err);
+        console.error("Erro ao remover funcionário:", err.response?.data || err);
 
         this.erro = "Erro ao excluir funcionário.";
 
