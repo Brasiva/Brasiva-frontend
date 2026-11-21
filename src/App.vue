@@ -1,11 +1,11 @@
-<script setup>
-import FuncionarioView from './views/FuncionarioView.vue';
-
-</script>
 <template>
-  <main>
-    <FuncionarioView />
-  </main>
+  <OfflineBanner />
+  <router-view />
 </template>
 
-<style scoped></style>
+<script setup>
+import OfflineBanner from './components/OfflineBanner.vue';
+</script>
+
+<style>
+</style>
