@@ -100,7 +100,7 @@ async function register(dados) {
 
   try {
     await api.post('/api/registro/', {
-      nome: dados.nome,
+      name: dados.nome,
       email: dados.email,
       password: dados.senha,
     })
@@ -134,6 +134,13 @@ async function login(email, senha) {
     token.value = response.data.access
     localStorage.setItem('token', response.data.access)
     localStorage.setItem('refresh', response.data.refresh)
+
+    const perfil = await api.get('/api/usuarios/me/', {
+      headers: { Authorization: `Bearer ${response.data.access}` },
+    })
+
+    usuario.value = perfil.data
+    localStorage.setItem('usuario', JSON.stringify(perfil.data))
 
     return true
   } catch (err) {

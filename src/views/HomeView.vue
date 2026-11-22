@@ -169,6 +169,7 @@ const nomeUsuario = computed(() => {
     )
 
     return (
+      usuario.name ||
       usuario.nome ||
       usuario.first_name ||
       usuario.username ||
