@@ -94,6 +94,57 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+async function register(dados) {
+  loading.value = true
+  error.value = null
+
+  try {
+    await api.post('/api/registro/', {
+      nome: dados.nome,
+      email: dados.email,
+      password: dados.senha,
+    })
+
+    return true
+  } catch (err) {
+    console.log('Erro no cadastro:', err.response?.data)
+    const data = err.response?.data
+    error.value =
+      data?.detail ||
+      data?.email?.[0] ||
+      data?.password?.[0] ||
+      'Erro ao cadastrar.'
+
+    return false
+  } finally {
+    loading.value = false
+  }
+}
+
+async function login(email, senha) {
+  loading.value = true
+  error.value = null
+
+  try {
+    const response = await api.post('/api/token/', {
+      email: email,
+      password: senha,
+    })
+
+    token.value = response.data.access
+    localStorage.setItem('token', response.data.access)
+    localStorage.setItem('refresh', response.data.refresh)
+
+    return true
+  } catch (err) {
+    error.value = err.response?.data?.detail || 'Email ou senha incorretos.'
+
+    return false
+  } finally {
+    loading.value = false
+  }
+}
+
   function logout() {
     usuario.value = null
     token.value = ''
@@ -111,6 +162,8 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     me,
     updateProfile,
+    register,
+    login,
     logout,
   }
 })
