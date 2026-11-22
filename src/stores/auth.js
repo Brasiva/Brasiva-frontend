@@ -8,17 +8,52 @@ export const useAuthStore = defineStore('auth', () => {
   const error = ref(null)
   const token = ref(localStorage.getItem('token') || '')
 
-  async function me() {
+  async function login(email, senha) {
     loading.value = true
     error.value = null
 
     try {
-      const response = await api.get('/api/usuarios/me/')
-      usuario.value = response.data
+      const response = await api.post('/api/token/', {
+        email,
+        password: senha,
+      })
+
+      token.value = response.data.access
+
+      localStorage.setItem('token', response.data.access)
+
+      if (response.data.refresh) {
+        localStorage.setItem('refresh', response.data.refresh)
+      }
+
+      await me()
+
+      localStorage.setItem('usuario', JSON.stringify(usuario.value))
+
+      return true
     } catch (err) {
-      error.value = err.response?.data?.detail || 'Erro ao carregar dados do usuário.'
+      error.value =
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        'Email ou senha incorretos.'
+
+      return false
     } finally {
       loading.value = false
+    }
+  }
+
+  async function me() {
+    try {
+      const response = await api.get('/api/usuarios/me/')
+      usuario.value = response.data
+
+      localStorage.setItem('usuario', JSON.stringify(response.data))
+
+      return true
+    } catch (err) {
+      usuario.value = null
+      return false
     }
   }
 
@@ -43,6 +78,8 @@ export const useAuthStore = defineStore('auth', () => {
       })
 
       usuario.value = response.data
+
+      localStorage.setItem('usuario', JSON.stringify(response.data))
 
       return true
     } catch (err) {
@@ -120,6 +157,7 @@ async function login(email, senha) {
     token.value = ''
 
     localStorage.removeItem('token')
+    localStorage.removeItem('refresh')
     localStorage.removeItem('usuario')
   }
 
@@ -128,6 +166,7 @@ async function login(email, senha) {
     loading,
     error,
     token,
+    login,
     me,
     updateProfile,
     register,
