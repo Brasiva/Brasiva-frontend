@@ -29,7 +29,7 @@ export const useEstoqueStore = defineStore('estoque', () => {
       ])
       categorias.value = categoriasApi
       itensEstoque.value = ingredientes.map((item) => {
-        const estoque = estoques.find((row) => row.id === item.estoque)
+        const estoque = estoques.find((row) => row.ingrediente === item.id)
         const categoria = categoriasApi.find((row) => row.id === item.categoria_ingrediente)
         return {
           id: item.id, estoqueId: estoque?.id, nome: item.nome, valor: Number(item.valor || 0),
@@ -46,23 +46,22 @@ export const useEstoqueStore = defineStore('estoque', () => {
 
   async function salvar(dados) {
     const stockPayload = { quantidade: Number(dados.quantidade), quantidade_minima: Number(dados.minimo), und_medida: dados.unidade || 'un' }
-    const atual = itensEstoque.value.find((item) => item.id === dados.id)
-    let estoqueId = atual?.estoqueId
-    if (estoqueId) await api.patch(`/api/estoque/${estoqueId}/`, stockPayload)
-    else estoqueId = (await api.post('/api/estoque/', stockPayload)).data.id
     const ingredientPayload = {
       nome: dados.nome, valor: Number(dados.valor || 0), und_med: dados.unidade || 'un',
-      categoria_ingrediente: dados.categoria ? Number(dados.categoria) : null, estoque: estoqueId,
+      categoria_ingrediente: dados.categoria ? Number(dados.categoria) : null,
     }
-    if (dados.id) await api.patch(`/api/ingredientes/${dados.id}/`, ingredientPayload)
-    else await api.post('/api/ingredientes/', ingredientPayload)
+    let ingredientId = dados.id
+    if (ingredientId) await api.patch(`/api/ingredientes/${ingredientId}/`, ingredientPayload)
+    else ingredientId = (await api.post('/api/ingredientes/', ingredientPayload)).data.id
+    const estoque = itensEstoque.value.find((item) => item.id === ingredientId)
+    const payload = { ...stockPayload, ingrediente: ingredientId }
+    if (estoque?.estoqueId) await api.patch(`/api/estoque/${estoque.estoqueId}/`, payload)
+    else await api.post('/api/estoque/', payload)
     await carregar()
   }
 
   async function excluir(id) {
-    const item = itensEstoque.value.find((row) => row.id === id)
     await api.delete(`/api/ingredientes/${id}/`)
-    if (item?.estoqueId) await api.delete(`/api/estoque/${item.estoqueId}/`)
     itensEstoque.value = itensEstoque.value.filter((row) => row.id !== id)
   }
 

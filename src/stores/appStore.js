@@ -76,7 +76,7 @@ export const useAppStore = defineStore('app', () => {
     try {
       const [categorias, itens, estoques] = await Promise.all([buscarTodas('/api/categoria-ingredientes/'), buscarTodas('/api/ingredientes/'), buscarTodas('/api/estoque/')])
       produtos.value = itens.map((item) => ({
-        id: item.id, nome: item.nome, quantidade: Number(estoques.find((estoque) => estoque.id === item.estoque)?.quantidade || 0), minimo: Number(estoques.find((estoque) => estoque.id === item.estoque)?.quantidade_minima || 0),
+        id: item.id, nome: item.nome, quantidade: Number(estoques.find((estoque) => estoque.ingrediente === item.id)?.quantidade || 0), minimo: Number(estoques.find((estoque) => estoque.ingrediente === item.id)?.quantidade_minima || 0),
         valor: Number(item.valor || 0), unidade: item.und_med,
         categoria: categorias.find((categoria) => categoria.id === item.categoria_ingrediente)?.nome || 'Sem categoria',
       }))
