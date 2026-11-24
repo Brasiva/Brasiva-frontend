@@ -1,21 +1,8 @@
 import { defineStore } from "pinia";
-import axios from "axios";
+import apiBase from '@/api/config'
+import { fetchAllPages } from '@/api/pagination'
 
-const API = import.meta.env.VITE_API_URL;
-
-const api = axios.create({
-  baseURL: `${API}/api`,
-});
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return config;
-});
+const api = { get: (path) => apiBase.get(`/api${path}`), post: (path, data, config) => apiBase.post(`/api${path}`, data, config), put: (path, data) => apiBase.put(`/api${path}`, data), delete: (path) => apiBase.delete(`/api${path}`) }
 
 export const useFuncionarioStore = defineStore("funcionarios", {
   state: () => ({
@@ -33,13 +20,7 @@ export const useFuncionarioStore = defineStore("funcionarios", {
       this.erro = null;
 
       try {
-        const resposta = await api.get("/funcionarios/");
-
-        const lista = Array.isArray(resposta.data)
-          ? resposta.data
-          : (resposta.data.results || []);
-
-        this.funcionarios = lista;
+        this.funcionarios = await fetchAllPages('/api/funcionarios/')
       } catch (err) {
         console.error("Erro ao buscar funcionários:", err.response?.data || err);
         this.erro = "Erro ao carregar funcionários.";

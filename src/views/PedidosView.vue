@@ -105,6 +105,16 @@
           </p>
         </div>
 
+        <section class="site-orders">
+          <h2>Solicitações recebidas pelo site</h2>
+          <p v-if="erroSite" class="site-error">{{ erroSite }}</p>
+          <p v-else-if="!pedidosSite.length" class="site-empty">Nenhuma solicitação enviada pelo site ainda.</p>
+          <article v-for="pedido in pedidosSite" :key="pedido.id" class="site-order">
+            <div><strong>#{{ pedido.id }} · {{ pedido.tipo_evento }}</strong><p>{{ pedido.nome }} · {{ pedido.email }} · {{ pedido.telefone }}</p><p>{{ pedido.convidados }} convidados · {{ formatarData(pedido.data_evento) }}</p><p>{{ pedido.itens.map(item => `${item.quantidade} × ${item.nome}`).join(', ') }}</p></div>
+            <div class="site-order__actions"><strong>{{ moeda(pedido.total_estimado) }}</strong><select :value="pedido.status" aria-label="Status da solicitação" @change="atualizarStatus(pedido, $event.target.value)"><option value="novo">Novo</option><option value="em_analise">Em análise</option><option value="contatado">Contatado</option><option value="aprovado">Aprovado</option><option value="recusado">Recusado</option></select></div>
+          </article>
+        </section>
+
       </div>
 
       <div
@@ -199,13 +209,29 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useAppStore } from '@/stores/appStore.js'
 
 const appStore = useAppStore()
 
 const pedidoSelecionado = ref(null)
 const dataFiltro = ref('')
+const pedidosSite = computed(() => appStore.pedidos)
+const erroSite = computed(() => appStore.erros.pedidos || '')
+
+onMounted(async () => { try { await appStore.carregarPedidos() } catch { /* erro renderizado no painel */ } })
+
+async function atualizarStatus(pedido, status) {
+  try {
+    await appStore.atualizarStatusPedido(pedido.id, status)
+  } catch {
+    appStore.erros.pedidos = 'Não foi possível atualizar o status da solicitação.'
+  }
+}
+
+function moeda(valor) {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor)
+}
 
 const pedidosFiltrados = computed(() => {
   if (!dataFiltro.value) {
@@ -426,6 +452,8 @@ function formatarData(dataHora) {
 .empty-state p {
   font-size: .75rem;
 }
+
+.site-orders{margin-top:32px}.site-orders h2{font-size:1.05rem;color:#333;margin-bottom:12px}.site-order{display:flex;justify-content:space-between;gap:20px;background:#fff;border:1px solid #eee;border-radius:12px;padding:16px;margin-bottom:10px}.site-order p{font-size:.75rem;color:#666;margin:6px 0}.site-order__actions{display:flex;flex-direction:column;gap:8px;align-items:flex-end;white-space:nowrap}.site-order__actions strong{color:#8c3428}.site-order select{border:1px solid #ddd;border-radius:7px;padding:7px}.site-empty,.site-error{font-size:.78rem;color:#777;padding:15px;background:#fff;border-radius:10px}.site-error{color:#a32121}@media(max-width:600px){.site-order{flex-direction:column}.site-order__actions{flex-direction:row;justify-content:space-between;align-items:center}}
 
 .modal-overlay {
   position: fixed;

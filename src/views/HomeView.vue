@@ -3,6 +3,8 @@
     <div class="main-content">
       <div class="page-body">
 
+        <p v-if="Object.keys(appStore.erros).length" class="data-warning">Algumas informações não puderam ser carregadas. Confira sua conexão com o sistema.</p>
+
         <section class="welcome-card">
           <div>
             <span class="welcome-label">Bem-vindo ao BRASIVA</span>
@@ -189,7 +191,7 @@ const totalFuncionarios = computed(() => {
 })
 
 onMounted(async () => {
-  await funcionarioStore.buscarFuncionarios()
+  await Promise.allSettled([appStore.carregarDashboard(), funcionarioStore.buscarFuncionarios()])
 })
 
 function formatarData(dataHora) {

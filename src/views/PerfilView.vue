@@ -13,7 +13,6 @@
         <div class="profile-card">
 
           <div class="profile-header">
-            <!-- Avatar Interativo -->
             <div
               class="avatar-container"
               :class="{ 'editable': editando }"

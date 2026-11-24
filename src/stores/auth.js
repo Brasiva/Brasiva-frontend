@@ -28,6 +28,12 @@ export const useAuthStore = defineStore('auth', () => {
 
       await me()
 
+      if (!usuario.value?.is_staff) {
+        logout()
+        error.value = 'Este acesso é restrito à equipe Brasiva.'
+        return false
+      }
+
       localStorage.setItem('usuario', JSON.stringify(usuario.value))
 
       return true
@@ -62,20 +68,15 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
 
     try {
-      const formData = new FormData()
-
-      formData.append('nome', dados.nome)
-      formData.append('email', dados.email)
-
+      const payload = { name: dados.nome, email: dados.email }
       if (dados.foto) {
-        formData.append('foto', dados.foto)
+        const imagem = new FormData()
+        imagem.append('file', dados.foto)
+        imagem.append('description', dados.nome)
+        const upload = await api.post('/api/media/images/', imagem, { headers: { 'Content-Type': 'multipart/form-data' } })
+        payload.foto_attachment_key = upload.data.attachment_key
       }
-
-      const response = await api.patch('/api/usuarios/me/', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
+      const response = await api.patch('/api/usuarios/me/', payload)
 
       usuario.value = response.data
 

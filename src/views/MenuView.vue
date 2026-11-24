@@ -7,7 +7,7 @@
         <p>Organize e monte os pratos com suas receitas.</p>
       </div> 
       
-      <button @click="abrirModalNovoPrato" class="btn-adicionar"> + Adicionar Prato </button>
+      <div class="acoes-cabecalho"><button @click="criarCategoria" class="btn-adicionar">+ Categoria</button><button @click="abrirModalNovoPrato" class="btn-adicionar"> + Adicionar Prato </button></div>
     </div>
     <!-- GRID DOS PRATOS -->
     <div v-if="listaPratos.length" class="cardapio-grid">
@@ -28,6 +28,9 @@
       </div>
     </div>
   </div>
+
+  <p v-if="cardapioStore.erro" class="erro-cardapio">{{ cardapioStore.erro }}</p>
+  <p v-else-if="cardapioStore.carregando" class="erro-cardapio">Carregando cardápio...</p>
 
   <!-- ESTADO VAZIO -->
   <div v-else class="empty-state">
@@ -59,9 +62,9 @@
         <div class="detalhe-coluna-direita">
           <div class="topo-detalhe-titulo">
             <h4> {{ (pratoSelecionado.nome || '').toUpperCase() }} </h4>
-            <span class="preco-tag"> R$ {{ Number(pratoSelecionado.preco).toFixed(2) }} </span>
+            <span class="preco-tag">{{ pratoSelecionado.sob_orcamento ? 'Sob orçamento' : moeda(pratoSelecionado.preco) }}</span>
           </div>
-          <p class="categoria-label"> <strong>Categoria:</strong> {{ pratoSelecionado.categoria }} </p>
+          <p class="categoria-label"> <strong>Categoria:</strong> {{ pratoSelecionado.categoriaNome }} </p>
           
           <h5>Ingredientes:</h5>
           <ul class="lista-ingredientes-grid">
@@ -70,6 +73,8 @@
           </ul>
           <!-- AÇÕES -->
           <div class="acoes-detalhe">
+            <button @click="abrirEdicao(pratoSelecionado)" class="btn-fechar-detalhe">Editar</button>
+            <button @click="alternarDisponibilidade(pratoSelecionado)" class="btn-fechar-detalhe">{{ pratoSelecionado.disponivel ? 'Desativar' : 'Ativar' }}</button>
             <button @click="fecharDetalhes" class="btn-fechar-detalhe" > Fechar </button>
             <button @click="deletarPrato(pratoSelecionado.id)" class="btn-deletar-prato" > Excluir Prato </button>
           </div>
@@ -79,7 +84,7 @@
     <!-- MODAL DE NOVO PRATO -->
     <div v-if="exibirModal" class="modal-overlay" @click.self="exibirModal = false" >
       <div class="modal-card">
-        <h3> NOVO PRATO </h3>
+        <h3>{{ formPrato.id ? 'EDITAR PRATO' : 'NOVO PRATO' }}</h3>
         <form @submit.prevent="salvarNovoPrato" class="modal-form" >
           <!-- NOME -->
           <div class="form-group">
@@ -90,27 +95,18 @@
           <div class="form-row">
             <div class="form-group">
               <label>Preço Sugerido (R$):</label>
-              <input type="number" step="0.01" v-model="formPrato.preco" placeholder="45.00" required />
+              <input type="number" step="0.01" v-model="formPrato.preco" placeholder="45.00" :required="!formPrato.sob_orcamento" :disabled="formPrato.sob_orcamento" />
             </div>
             <div class="form-group">
               <label>Categoria:</label>
               <select v-model="formPrato.categoria" required >
-                <option value="Prato Principal"> Prato Principal </option>
-                <option value="Acompanhamento"> Acompanhamento </option>
-                <option value="Sobremesa"> Sobremesa </option>
-                <option value="Bebida"> Bebidas </option>
+                <option v-for="categoria in cardapioStore.categorias" :key="categoria.id" :value="categoria.id">{{ categoria.nome }}</option>
               </select>
             </div>
           </div>
-          <!-- INGREDIENTES -->
-          <div class="form-group">
-            <label class="label-estoque-info"> Ingredientes Necessários: </label>
-            <div class="estoque-checkbox-scroll">
-              <label v-for="item in listaMockEstoque" :key="item" class="checkbox-item" > 
-                <input type="checkbox" :value="item" v-model="formPrato.ingredientesSelecionados" /> <span>{{ item }}</span>
-              </label>
-            </div>
-          </div>
+          <div class="form-group"><label><input v-model="formPrato.sob_orcamento" type="checkbox"> Sob orçamento, sem preço fixo</label></div>
+          <div class="form-group"><label><input v-model="formPrato.disponivel" type="checkbox"> Disponibilizar no site p?blico</label></div>
+          <div class="form-group"><label>Unidade de venda:</label><input v-model="formPrato.unidade" required maxlength="30" placeholder="Ex.: kg, cento (100 unidades)"></div>
           <!-- MODO DE FAZER -->
           <div class="form-group">
             <label> Modo de Fazer / Descrição: </label>
@@ -119,7 +115,7 @@
           <!-- BOTÕES -->
           <div class="modal-actions">
             <button type="button" @click="exibirModal = false" class="btn-modal-voltar" > Voltar </button>
-            <button type="submit" class="btn-modal-salvar" > CADASTRAR PRATO </button>
+            <button type="submit" class="btn-modal-salvar">{{ formPrato.id ? 'SALVAR ALTERAÇÕES' : 'CADASTRAR PRATO' }}</button>
           </div>
         </form>
       </div>
@@ -136,6 +132,7 @@ import { useCardapioStore } from '@/stores/cardapio';
 
 
 const cardapioStore = useCardapioStore();
+const moeda = (valor) => valor == null ? 'Sob orçamento' : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(valor));
 // A lista de pratos agora vem da store
 const listaPratos = computed(() => cardapioStore.pratos);
 
@@ -158,9 +155,13 @@ const exibirModal = ref(false);
 // FORMULÁRIO DE NOVO PRATO
 
 const formPrato = ref({
+  id: null,
   nome: '',
   preco: '',
-  categoria: 'Prato Principal',
+  categoria: cardapioStore.categorias[0]?.id || '',
+  unidade: 'unidade',
+  disponivel: false,
+  sob_orcamento: false,
   modoFazer: '',
   ingredientesSelecionados: []
 });
@@ -169,22 +170,11 @@ const formPrato = ref({
 
 // Por enquanto continua estático.
 // Depois podemos vincular isso ao estoque do banco.
-const listaMockEstoque = ref([
-  'Filé de Salmão',
-  'Feijão Preto',
-  'Arroz Branco',
-  'Batata',
-  'Ovos',
-  'Leite Condensado',
-  'Carne Moída',
-  'Frango'
-]);
+
 
 // CARREGAR PRATOS
 
-onMounted(async () => {
-  await cardapioStore.buscarPratosDoServidor();
-});
+onMounted(async () => { try { await cardapioStore.buscarPratosDoServidor() } catch { /* Error is shown by the store. */ } });
 
 // ABRIR DETALHES
 
@@ -202,9 +192,13 @@ const fecharDetalhes = () => {
 
 const abrirModalNovoPrato = () => {
   formPrato.value = {
+    id: null,
     nome: '',
     preco: '',
-    categoria: 'Prato Principal',
+    categoria: cardapioStore.categorias[0]?.id || '',
+    unidade: 'unidade',
+    disponivel: false,
+    sob_orcamento: false,
     modoFazer: '',
     ingredientesSelecionados: []
   };
@@ -216,21 +210,46 @@ const abrirModalNovoPrato = () => {
 const salvarNovoPrato = async () => {
   const novoPrato = {
     nome: formPrato.value.nome,
-    preco: Number(formPrato.value.preco) || 0,
+    preco: formPrato.value.sob_orcamento ? null : Number(formPrato.value.preco),
     categoria: formPrato.value.categoria,
     modoFazer: formPrato.value.modoFazer,
+    unidade: formPrato.value.unidade || 'unidade',
+    disponivel: formPrato.value.disponivel,
+    sob_orcamento: formPrato.value.sob_orcamento,
     ingredientes: [...formPrato.value.ingredientesSelecionados]
   };
-  await cardapioStore.adicionarPrato(novoPrato);
-  exibirModal.value = false;
+  try {
+    if (formPrato.value.id) await cardapioStore.atualizarPrato({ ...novoPrato, id: formPrato.value.id, disponivel: formPrato.value.disponivel, sob_orcamento: formPrato.value.sob_orcamento })
+    else await cardapioStore.adicionarPrato(novoPrato)
+    exibirModal.value = false
+  }
+  catch { alert('Não foi possível salvar o prato. Verifique a conexão e os dados.') }
+};
+
+const abrirEdicao = (prato) => {
+  formPrato.value = { id: prato.id, nome: prato.nome, preco: prato.preco, categoria: prato.categoria, modoFazer: prato.modoFazer, unidade: prato.unidade, disponivel: prato.disponivel, sob_orcamento: prato.sob_orcamento, ingredientesSelecionados: [] }
+  pratoSelecionadoId.value = null
+  exibirModal.value = true
+}
+
+const alternarDisponibilidade = async (prato) => {
+  try { await cardapioStore.atualizarPrato({ ...prato, disponivel: !prato.disponivel }); pratoSelecionadoId.value = prato.id }
+  catch { alert('Não foi possível atualizar a disponibilidade.') }
+}
+
+const criarCategoria = async () => {
+  const nome = prompt('Nome da nova categoria:')?.trim();
+  if (!nome) return;
+  try { await cardapioStore.adicionarCategoria(nome) }
+  catch { alert('Não foi possível criar a categoria.') }
 };
 
 // DELETAR PRATO
 
 const deletarPrato = async (id) => {
   if (confirm('Tem certeza que deseja remover este prato?')) {
-    await cardapioStore.removerPrato(id);
-    pratoSelecionadoId.value = null;
+    try { await cardapioStore.removerPrato(id); pratoSelecionadoId.value = null }
+    catch { alert('Não foi possível excluir o prato.') }
   }
 };
 </script>
@@ -256,6 +275,8 @@ const deletarPrato = async (id) => {
   margin-bottom: 1.5rem; 
   gap: 1rem;
 }
+.acoes-cabecalho{display:flex;gap:9px;flex-wrap:wrap}
+.header-actions{display:flex;gap:10px;flex-wrap:wrap}
 .textos-topo h2 { 
   font-size: 1.6rem;
   margin: 0; 

@@ -15,6 +15,7 @@
               Lista de compras
             </button>
 
+            <button class="btn-compras" @click="criarCategoria">+ Categoria</button>
             <button class="btn-primary" @click="abrirNovoProduto">
               <span class="material-symbols-outlined">add</span>
               Adicionar produto
@@ -60,18 +61,16 @@
             </div>
           </div>
         </div>
+        <p v-if="estoqueStore.erro" class="empty-state">{{ estoqueStore.erro }}</p>
         <div class="filters-card">
           <div class="search-box">
             <span class="material-symbols-outlined">search</span>
             <input v-model="pesquisa" type="text" placeholder="Pesquisar produto..." />
           </div>
           <select v-model="categoriaSelecionada">
-            <option value="">Todas as categorias</option>
-            <option value="Alimentos">Alimentos</option>
-            <option value="Bebidas">Bebidas</option>
-            <option value="Materiais">Materiais</option>
-            <option value="Descartáveis">Descartáveis</option>
-          </select>
+              <option value="">Todas as categorias</option>
+              <option v-for="categoria in estoqueStore.categorias" :key="categoria.id" :value="categoria.nome">{{ categoria.nome }}</option>
+            </select>
           <select v-model="statusSelecionado">
             <option value="">Todos os status</option>
             <option value="normal">Normal</option>
@@ -160,10 +159,7 @@
             <label>Categoria</label>
             <select v-model="form.categoria">
               <option value="">Selecione</option>
-              <option value="Alimentos">Alimentos</option>
-              <option value="Bebidas">Bebidas</option>
-              <option value="Materiais">Materiais</option>
-              <option value="Descartáveis">Descartáveis</option>
+              <option v-for="categoria in estoqueStore.categorias" :key="categoria.id" :value="categoria.id">{{ categoria.nome }}</option>
             </select>
           </div>
           <div class="input-group">
@@ -202,11 +198,11 @@
   </div>
 </template>
 <script setup>
-import { computed, ref } from 'vue'
-import { useAppStore } from '@/stores/appStore.js'
+import { computed, onMounted, ref } from 'vue'
+import { useEstoqueStore } from '@/stores/estoque'
 import ListaCompras from '@/components/ListaCompras.vue'
 
-const appStore = useAppStore()
+const estoqueStore = useEstoqueStore()
 
 const pesquisa = ref('')
 const categoriaSelecionada = ref('')
@@ -225,7 +221,8 @@ const form = ref({
   valor: 0
 })
 
-const produtos = computed(() => appStore.produtos)
+const produtos = computed(() => estoqueStore.itensEstoque)
+onMounted(async () => { try { await estoqueStore.carregar() } catch { /* erro informado pela store */ } })
 
 const produtosFiltrados = computed(() => {
   return produtos.value.filter(produto => {
@@ -325,35 +322,32 @@ function abrirNovoProduto() {
 
 function editarProduto(produto) {
   modoEdicao.value = true
-  form.value = { ...produto }
+  form.value = { ...produto, categoria: produto.categoriaId }
 
   mostrarModal.value = true
 }
 
-function salvarProduto() {
+async function salvarProduto() {
   if (!form.value.nome || !form.value.categoria) {
     return
   }
 
-  if (modoEdicao.value) {
-    appStore.atualizarProduto({
-      ...form.value
-    })
-  } else {
-    appStore.adicionarProduto({
-      ...form.value
-    })
-  }
-
-  fecharModal()
+  try { await estoqueStore.salvar({ ...form.value }); fecharModal() }
+  catch { alert('Não foi possível salvar o item de estoque.') }
 }
 
-function excluirProduto(id) {
+async function excluirProduto(id) {
   if (!confirm('Deseja realmente excluir este produto?')) {
     return
   }
 
-  appStore.excluirProduto(id)
+  try { await estoqueStore.excluir(id) } catch { alert('Não foi possível excluir o item de estoque.') }
+}
+
+async function criarCategoria() {
+  const nome = prompt('Nome da categoria de estoque:')?.trim()
+  if (!nome) return
+  try { await estoqueStore.adicionarCategoria(nome) } catch { alert('N?o foi poss?vel criar a categoria.') }
 }
 
 function fecharModal() {

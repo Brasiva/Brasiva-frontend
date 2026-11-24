@@ -5,6 +5,8 @@
 
         <div class="calendar-container">
 
+          <p v-if="appStore.erros.eventos" class="no-events">{{ appStore.erros.eventos }}</p>
+
           <div class="calendar-header">
 
             <div class="month-title">
@@ -226,7 +228,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/appStore.js'
 
@@ -238,6 +240,8 @@ const hojeData = new Date()
 const mes = ref(hojeData.getMonth())
 const ano = ref(hojeData.getFullYear())
 const selecionado = ref(null)
+
+onMounted(async () => { try { await appStore.carregarEventos() } catch { /* erro visível via store */ } })
 
 const meses = [
   'Janeiro',

@@ -45,6 +45,7 @@
 
           <!-- Estado Vazio -->
           <div v-else-if="notificacoesFiltradas.length === 0" class="state-container">
+            <p v-if="notificacoesStore.error" class="empty-desc">{{ notificacoesStore.error }}</p>
             <span class="material-symbols-outlined empty-icon">notifications_off</span>
             <p class="empty-title">Nenhuma notificação por aqui</p>
             <p class="empty-desc">

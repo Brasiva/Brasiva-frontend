@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+  baseURL: (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://brasiva-backend.class.fabricadesoftware.ifc.edu.br' : 'http://localhost:8000')).replace(/\/$/, ''),
   headers: {
     'Content-Type': 'application/json',
   },

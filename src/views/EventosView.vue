@@ -31,8 +31,9 @@
           </div>
         </div>
 
+        <p v-if="appStore.erros.eventos" class="empty-state">{{ appStore.erros.eventos }}</p>
         <div
-          v-if="eventosFiltrados.length"
+          v-else-if="eventosFiltrados.length"
           class="cards-grid"
         >
           <div
@@ -231,13 +232,15 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useAppStore } from '@/stores/appStore.js'
 
 const appStore = useAppStore()
 
 const eventoDetalhe = ref(null)
 const dataFiltro = ref('')
+
+onMounted(async () => { try { await appStore.carregarEventos() } catch { /* erro visível via store */ } })
 
 const eventosFiltrados = computed(() => {
   if (!dataFiltro.value) {

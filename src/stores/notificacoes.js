@@ -1,93 +1,46 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import api from '@/api/config'
+import { fetchAllPages } from '@/api/pagination'
 
 export const useNotificacoesStore = defineStore('notificacoes', () => {
   const notificacoes = ref([])
   const loading = ref(false)
-  const error = ref(null)
+  const error = ref('')
+  const naoLidasCount = computed(() => notificacoes.value.filter((item) => !item.lida).length)
 
-  // Retorna a quantidade de notificações não lidas
-  const naoLidasCount = computed(() => {
-    return notificacoes.value.filter(n => !n.lida).length
-  })
-
-  // Buscar notificações da API (ou fallback para lista inicial)
   async function buscarNotificacoes() {
     loading.value = true
-    error.value = null
+    error.value = ''
     try {
-      const response = await api.get('/api/notificacoes/')
-      notificacoes.value = response.data
+      notificacoes.value = await fetchAllPages('/api/notificacoes/')
     } catch (err) {
-      // Caso a API ainda não tenha o endpoint pronto, mantém os dados fictícios para teste
-      if (notificacoes.value.length === 0) {
-        notificacoes.value = [
-          {
-            id: 1,
-            titulo: 'Perfil Atualizado',
-            mensagem: 'Suas informações de perfil foram alteradas com sucesso.',
-            data: new Date().toISOString(),
-            lida: false,
-            tipo: 'sucesso' // 'sucesso', 'alerta', 'info', 'erro'
-          },
-          {
-            id: 2,
-            titulo: 'Bem-vindo ao Brasiva!',
-            mensagem: 'Explore todas as funcionalidades disponíveis na plataforma.',
-            data: new Date(Date.now() - 86400000).toISOString(),
-            lida: true,
-            tipo: 'info'
-          }
-        ]
-      }
-    } finally {
-      loading.value = false
-    }
+      notificacoes.value = []
+      error.value = err.response?.data?.detail || 'Não foi possível carregar as notificações.'
+    } finally { loading.value = false }
   }
 
-  // Marcar uma notificação específica como lida
   async function marcarComoLida(id) {
-    const notif = notificacoes.value.find(n => n.id === id)
-    if (!notif) return
-
-    notif.lida = true
-
     try {
-      await api.patch(`/api/notificacoes/${id}/`, { lida: true })
-    } catch (err) {
-      // Se falhar no backend, mantém alterado no front para boa UX
-    }
+      const { data } = await api.patch(`/api/notificacoes/${id}/`, { lida: true })
+      const item = notificacoes.value.find((notificacao) => notificacao.id === id)
+      if (item) Object.assign(item, data)
+    } catch (err) { error.value = 'Não foi possível atualizar a notificação.' }
   }
 
-  // Marcar todas como lidas
   async function marcarTodasComoLidas() {
-    notificacoes.value.forEach(n => (n.lida = true))
     try {
       await api.post('/api/notificacoes/marcar-todas-lidas/')
-    } catch (err) {
-      // Ignora se não houver backend
-    }
+      notificacoes.value.forEach((item) => { item.lida = true })
+    } catch (err) { error.value = 'Não foi possível marcar as notificações.' }
   }
 
-  // Excluir notificação
   async function removerNotificacao(id) {
-    notificacoes.value = notificacoes.value.filter(n => n.id !== id)
     try {
       await api.delete(`/api/notificacoes/${id}/`)
-    } catch (err) {
-      // Ignora se não houver backend
-    }
+      notificacoes.value = notificacoes.value.filter((item) => item.id !== id)
+    } catch (err) { error.value = 'Não foi possível excluir a notificação.' }
   }
 
-  return {
-    notificacoes,
-    loading,
-    error,
-    naoLidasCount,
-    buscarNotificacoes,
-    marcarComoLida,
-    marcarTodasComoLidas,
-    removerNotificacao
-  }
+  return { notificacoes, loading, error, naoLidasCount, buscarNotificacoes, marcarComoLida, marcarTodasComoLidas, removerNotificacao }
 })
