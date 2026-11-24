@@ -183,7 +183,9 @@ const nomeUsuario = computed(() => {
 })
 
 const pedidosRecentes = computed(() => {
-  return appStore.pedidos.slice(0, 3)
+  return appStore.pedidos
+    .filter((pedido) => !['aprovado', 'recusado'].includes(pedido.status))
+    .slice(0, 3)
 })
 
 const totalFuncionarios = computed(() => {

@@ -10,6 +10,7 @@
       <div class="acoes-cabecalho"><button @click="criarCategoria" class="btn-adicionar">+ Categoria</button><button @click="abrirModalNovoPrato" class="btn-adicionar"> + Adicionar Prato </button></div>
     </div>
     <!-- GRID DOS PRATOS -->
+    <p v-if="mensagemFeedback" class="menu-feedback" role="status">{{ mensagemFeedback }}</p>
     <p v-if="cardapioStore.erro" class="erro-cardapio">{{ cardapioStore.erro }}</p>
     <p v-else-if="cardapioStore.carregando" class="erro-cardapio">Carregando cardapio...</p>
     <div v-else-if="!listaPratos.length" class="empty-state">
@@ -87,7 +88,7 @@
             </div>
           </div>
           <div class="form-group"><label><input v-model="formPrato.sob_orcamento" type="checkbox"> Sob orçamento, sem preço fixo</label></div>
-          <div class="form-group"><label><input v-model="formPrato.disponivel" type="checkbox"> Disponibilizar no site p?blico</label></div>
+          <div class="form-group"><label><input v-model="formPrato.disponivel" type="checkbox"> Disponibilizar no site público</label></div>
           <div class="form-group"><label>Unidade de venda:</label><input v-model="formPrato.unidade" required maxlength="30" placeholder="Ex.: kg, cento (100 unidades)"></div>
           <!-- MODO DE FAZER -->
           <div class="form-group">
@@ -95,6 +96,7 @@
             <textarea v-model="formPrato.modoFazer" rows="3" placeholder="Insira o passo a passo da receita..." ></textarea>
           </div>
           <!-- BOTÕES -->
+          <p v-if="erroPrato" class="modal-feedback error" role="alert">{{ erroPrato }}</p>
           <div class="modal-actions">
             <button type="button" @click="exibirModal = false" class="btn-modal-voltar" > Voltar </button>
             <button type="submit" class="btn-modal-salvar">{{ formPrato.id ? 'SALVAR ALTERAÇÕES' : 'CADASTRAR PRATO' }}</button>
@@ -102,10 +104,27 @@
         </form>
       </div>
     </div>
+    <div v-if="exibirModalCategoria" class="modal-overlay" @click.self="exibirModalCategoria = false">
+      <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="category-modal-title">
+        <h3 id="category-modal-title">Nova categoria</h3>
+        <form class="modal-form" @submit.prevent="salvarCategoria">
+          <div class="form-group"><label for="nome-categoria">Nome da categoria</label><input id="nome-categoria" v-model.trim="nomeCategoria" maxlength="100" required autofocus></div>
+          <p v-if="erroCategoria" class="modal-feedback error" role="alert">{{ erroCategoria }}</p>
+          <div class="modal-actions"><button type="button" class="btn-modal-voltar" @click="exibirModalCategoria = false">Cancelar</button><button type="submit" class="btn-modal-salvar" :disabled="salvandoCategoria">{{ salvandoCategoria ? 'Salvando…' : 'Salvar categoria' }}</button></div>
+        </form>
+      </section>
+    </div>
+    <div v-if="pratoPendenteExclusao" class="modal-overlay" @click.self="pratoPendenteExclusao = null">
+      <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="delete-dish-title">
+        <h3 id="delete-dish-title">Excluir prato?</h3>
+        <p class="delete-copy">Confirma a remoção de <strong>{{ pratoPendenteExclusao.nome }}</strong> do cardápio?</p>
+        <p v-if="erroExclusao" class="modal-feedback error" role="alert">{{ erroExclusao }}</p>
+        <div class="modal-actions"><button type="button" class="btn-modal-voltar" @click="pratoPendenteExclusao = null">Cancelar</button><button type="button" class="btn-delete-confirm" :disabled="excluindoPrato" @click="confirmarExclusao">{{ excluindoPrato ? 'Excluindo…' : 'Excluir prato' }}</button></div>
+      </section>
+    </div>
   </div>
 </template>
 
-```vue
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useCardapioStore } from '@/stores/cardapio';
@@ -134,6 +153,16 @@ const pratoSelecionado = computed(() => {
 // CONTROLE DOS MODAIS
 
 const exibirModal = ref(false);
+const exibirModalCategoria = ref(false)
+const nomeCategoria = ref('')
+const erroCategoria = ref('')
+const salvandoCategoria = ref(false)
+const erroPrato = ref('')
+const mensagemFeedback = ref('')
+const pratoPendenteExclusaoId = ref(null)
+const erroExclusao = ref('')
+const excluindoPrato = ref(false)
+const pratoPendenteExclusao = computed(() => listaPratos.value.find((prato) => prato.id === pratoPendenteExclusaoId.value))
 
 // FORMULÁRIO DE NOVO PRATO
 
@@ -174,6 +203,7 @@ const fecharDetalhes = () => {
 // ABRIR MODAL DE NOVO PRATO
 
 const abrirModalNovoPrato = () => {
+  erroPrato.value = ''
   formPrato.value = {
     id: null,
     nome: '',
@@ -205,11 +235,13 @@ const salvarNovoPrato = async () => {
     if (formPrato.value.id) await cardapioStore.atualizarPrato({ ...novoPrato, id: formPrato.value.id, disponivel: formPrato.value.disponivel, sob_orcamento: formPrato.value.sob_orcamento })
     else await cardapioStore.adicionarPrato(novoPrato)
     exibirModal.value = false
+    mensagemFeedback.value = formPrato.value.id ? 'Prato atualizado.' : 'Prato cadastrado.'
   }
-  catch { alert('Não foi possível salvar o prato. Verifique a conexão e os dados.') }
+  catch { erroPrato.value = 'Não foi possível salvar o prato. Verifique a conexão e os dados.' }
 };
 
 const abrirEdicao = (prato) => {
+  erroPrato.value = ''
   formPrato.value = { id: prato.id, nome: prato.nome, preco: prato.preco, categoria: prato.categoria, modoFazer: prato.modoFazer, unidade: prato.unidade, disponivel: prato.disponivel, sob_orcamento: prato.sob_orcamento, ingredientesSelecionados: [] }
   pratoSelecionadoId.value = null
   exibirModal.value = true
@@ -217,28 +249,53 @@ const abrirEdicao = (prato) => {
 
 const alternarDisponibilidade = async (prato) => {
   try { await cardapioStore.atualizarPrato({ ...prato, disponivel: !prato.disponivel }); pratoSelecionadoId.value = prato.id }
-  catch { alert('Não foi possível atualizar a disponibilidade.') }
+  catch { mensagemFeedback.value = 'Não foi possível atualizar a disponibilidade.' }
 }
 
-const criarCategoria = async () => {
-  const nome = prompt('Nome da nova categoria:')?.trim();
-  if (!nome) return;
-  try { await cardapioStore.adicionarCategoria(nome) }
-  catch { alert('Não foi possível criar a categoria.') }
-};
+const criarCategoria = () => {
+  nomeCategoria.value = ''
+  erroCategoria.value = ''
+  exibirModalCategoria.value = true
+}
+
+const salvarCategoria = async () => {
+  if (!nomeCategoria.value.trim()) return
+  salvandoCategoria.value = true
+  erroCategoria.value = ''
+  try {
+    await cardapioStore.adicionarCategoria(nomeCategoria.value.trim())
+    exibirModalCategoria.value = false
+    mensagemFeedback.value = 'Categoria criada.'
+  } catch {
+    erroCategoria.value = 'Não foi possível criar a categoria. Verifique a conexão e tente novamente.'
+  } finally {
+    salvandoCategoria.value = false
+  }
+}
 
 // DELETAR PRATO
 
-const deletarPrato = async (id) => {
-  if (confirm('Tem certeza que deseja remover este prato?')) {
-    try { await cardapioStore.removerPrato(id); pratoSelecionadoId.value = null }
-    catch { alert('Não foi possível excluir o prato.') }
+const deletarPrato = (id) => {
+  pratoSelecionadoId.value = null
+  pratoPendenteExclusaoId.value = id
+  erroExclusao.value = ''
+}
+
+const confirmarExclusao = async () => {
+  if (!pratoPendenteExclusao.value || excluindoPrato.value) return
+  excluindoPrato.value = true
+  erroExclusao.value = ''
+  try {
+    await cardapioStore.removerPrato(pratoPendenteExclusao.value.id)
+    pratoPendenteExclusaoId.value = null
+    mensagemFeedback.value = 'Prato removido do cardápio.'
+  } catch {
+    erroExclusao.value = 'Não foi possível excluir o prato. Tente novamente.'
+  } finally {
+    excluindoPrato.value = false
   }
-};
+}
 </script>
-```
-
-
 <style scoped>
 /*PÁGINA*/
 .cardapio-page { 
@@ -663,4 +720,10 @@ const deletarPrato = async (id) => {
 
 .category-groups{display:grid;gap:22px}.category-group{padding:18px 20px;border:1px solid #e8e7e4;border-radius:16px;background:#fff;box-shadow:0 4px 14px #1d23290a}.category-group>header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.category-group h3{margin:0;color:#343638;font-size:1.05rem}.category-group header p{margin:4px 0 0;color:#85898d;font-size:.78rem}.dish-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}.dish-mini-card{display:grid;gap:8px;min-height:96px;padding:14px;text-align:left;border:1px solid #e8e7e4;border-radius:12px;background:#fff;cursor:pointer;transition:transform .18s,box-shadow .18s}.dish-mini-card:hover{transform:translateY(-2px);box-shadow:0 7px 18px #1d232912}.dish-name{font-size:.9rem;font-weight:700;color:#383532}.dish-details{font-size:.82rem;color:#6f716f}.dish-status{justify-self:start;padding:4px 8px;border-radius:20px;background:#f4eee8;color:#8a593f;font-size:.68rem;font-weight:700}.dish-status.available{background:#eaf3eb;color:#49714e}.detail-category{display:inline-flex;align-self:flex-start;padding:7px 10px;border-radius:18px;background:#f5eee9;color:#81513d;font-size:.8rem;font-weight:700}
 @media(max-width:600px){.category-group{padding:14px}.dish-grid{grid-template-columns:1fr 1fr}.dish-mini-card{padding:11px}}
+
+/* Componentes limpos para ações e modais do cardápio */
+.cardapio-page{color:#343638}.btn-adicionar{background:#f7f5f2;color:#4d5155;border:1px solid #e2e1de;border-radius:9px}.btn-adicionar:hover{background:#eee9e3;border-color:#d8c9bb}.dish-mini-card:focus-visible,.btn-adicionar:focus-visible,.acoes-detalhe button:focus-visible,.modal-actions button:focus-visible{outline:3px solid #d7b79c;outline-offset:2px}.modal-overlay{background:rgba(24,27,29,.48);backdrop-filter:blur(3px)}.modal-card,.modal-detalhe-prato{background:#fff;color:#373633;border:1px solid #ebe7e2;border-radius:16px;box-shadow:0 18px 48px #1517192b}.modal-card h3{color:#373633}.modal-card label{color:#55514d}.modal-form{gap:14px}.form-group{gap:5px}.form-group label{margin:0;font-size:.82rem;font-weight:650}.form-group input,.form-group select,.form-group textarea,.modal-card input,.estoque-checkbox-scroll{min-height:40px;border:1px solid #dedbd7;border-radius:8px;background:#fff;color:#363738;padding:9px 11px;font:inherit;font-size:.86rem}.form-group input:focus-visible,.form-group select:focus-visible,.form-group textarea:focus-visible{outline:3px solid #d7b79c;outline-offset:1px}.form-group input[type=checkbox]{min-height:auto;accent-color:#94745d}.preco-tag,.detail-category{background:#f4eee8;color:#76533e;border:1px solid #e9dfd5}.topo-detalhe-titulo{border-bottom-color:#eee8e2}.acoes-detalhe{justify-content:flex-end;flex-wrap:wrap;gap:8px}.acoes-detalhe button,.modal-actions button{min-height:38px;border:1px solid #dedbd7;border-radius:9px;background:#fff;color:#4d5155;padding:8px 12px;font:inherit;font-size:.82rem;font-weight:600;cursor:pointer;transition:background .18s,border-color .18s}.acoes-detalhe button:hover,.modal-actions button:hover{background:#f7f5f2;border-color:#d8c9bb}.acoes-detalhe .btn-deletar-prato{border-color:#ecd7d3;background:#fbf3f1;color:#9a4037}.acoes-detalhe .btn-deletar-prato:hover{background:#f5e5e1}.modal-actions{justify-content:flex-end}.modal-actions .btn-modal-salvar{border-color:#d9c8b6;background:#f4eee8;color:#624737}.modal-actions .btn-modal-salvar:hover{background:#eee3d8}.modal-actions .btn-modal-voltar{background:#fff;color:#555}.modal-actions button:disabled{opacity:.55;cursor:not-allowed}
+:global(html.dark-mode) .cardapio-page{background:#1d2022;color:#eceae7}:global(html.dark-mode) .textos-topo h2,:global(html.dark-mode) .category-group h3,:global(html.dark-mode) .dish-name{color:#f0ece7}:global(html.dark-mode) .textos-topo p,:global(html.dark-mode) .category-group header p,:global(html.dark-mode) .dish-details{color:#b9b5b0}:global(html.dark-mode) .category-group,:global(html.dark-mode) .dish-mini-card,:global(html.dark-mode) .modal-card,:global(html.dark-mode) .modal-detalhe-prato{background:#262a2c;border-color:#393d3f;color:#eceae7;box-shadow:0 8px 28px #0003}:global(html.dark-mode) .dish-mini-card:hover{box-shadow:0 8px 24px #0005}:global(html.dark-mode) .dish-status{background:#393330;color:#e6cbb6}:global(html.dark-mode) .dish-status.available{background:#2d3d32;color:#b9d6bc}:global(html.dark-mode) .modal-card h3,:global(html.dark-mode) .modal-card label,:global(html.dark-mode) .topo-detalhe-titulo h4,:global(html.dark-mode) .modal-detalhe-prato h5,:global(html.dark-mode) .categoria-label,:global(html.dark-mode) .modo-fazer-container p{color:#eceae7}:global(html.dark-mode) .form-group input,:global(html.dark-mode) .form-group select,:global(html.dark-mode) .form-group textarea,:global(html.dark-mode) .modal-card input,:global(html.dark-mode) .estoque-checkbox-scroll{background:#1f2325;border-color:#484d4f;color:#f0eeeb}:global(html.dark-mode) .acoes-detalhe button,:global(html.dark-mode) .modal-actions button,:global(html.dark-mode) .btn-adicionar{background:#303537;border-color:#494e50;color:#f1efec}:global(html.dark-mode) .acoes-detalhe button:hover,:global(html.dark-mode) .modal-actions button:hover,:global(html.dark-mode) .btn-adicionar:hover{background:#3a4042}:global(html.dark-mode) .acoes-detalhe .btn-deletar-prato{background:#432d2a;border-color:#68413b;color:#f0b7ae}:global(html.dark-mode) .acoes-detalhe .btn-deletar-prato:hover{background:#543532}:global(html.dark-mode) .preco-tag,:global(html.dark-mode) .detail-category{background:#393330;border-color:#51443a;color:#e6cbb6}:global(html.dark-mode) .topo-detalhe-titulo{border-bottom-color:#414648}:global(html.dark-mode) .modal-overlay{background:#090b0ccc}
+@media(max-width:600px){.acoes-detalhe{justify-content:stretch}.acoes-detalhe button{flex:1}.modal-card{padding:18px}}
+.menu-feedback{margin:0 0 14px;padding:10px 12px;border:1px solid #e5ddd5;border-radius:9px;background:#faf7f3;color:#614d40;font-size:.84rem}.modal-feedback{margin:0;font-size:.82rem}.modal-feedback.error{color:#a33b32}.delete-copy{color:#635f5b;line-height:1.55}.btn-delete-confirm{min-height:38px;border:1px solid #ecd7d3;border-radius:9px;background:#fbf3f1;color:#9a4037;padding:8px 12px;font:inherit;font-size:.82rem;font-weight:650;cursor:pointer}.btn-delete-confirm:hover{background:#f5e5e1}.btn-delete-confirm:focus-visible{outline:3px solid #d7b79c;outline-offset:2px}.btn-delete-confirm:disabled{opacity:.55;cursor:wait}:global(html.dark-mode) .menu-feedback{background:#302b27;border-color:#4b413a;color:#e1cbb6}:global(html.dark-mode) .delete-copy{color:#c5bfba}:global(html.dark-mode) .modal-feedback.error{color:#efa49a}:global(html.dark-mode) .btn-delete-confirm{background:#432d2a;border-color:#68413b;color:#f0b7ae}:global(html.dark-mode) .btn-delete-confirm:hover{background:#543532}
 </style>

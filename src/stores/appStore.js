@@ -75,6 +75,8 @@ export const useAppStore = defineStore('app', () => {
           pessoas: evento.quantidade_pessoas, dataHora: dataHora(evento.data_hora), dataISO: evento.data_hora.slice(0, 10),
           hora: data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
           itensPedido: pedidoSite?.itens || [],
+          equipeEvento,
+          funcionariosIds: equipeEvento.map((linha) => linha.funcionario),
           endereco: endereco ? `${endereco.logradouro}, ${endereco.numero || 's/n'} — ${endereco.bairro}, ${endereco.cidade}/${endereco.estado}` : '',
           orcamento: dinheiro(orcamento?.valor_total_orcamento ?? evento.taxa_utensilio),
           cardapio: pratos.filter((prato) => pratoIds.includes(prato.id)).map((prato) => prato.nome),

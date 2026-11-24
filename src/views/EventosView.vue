@@ -215,20 +215,18 @@
                 <span class="material-symbols-outlined">
                   groups
                 </span>
-                Funcionários
+                Equipe do evento
               </h4>
-
-              <ul>
-                <li
-                  v-for="(func, i) in eventoDetalhe.funcionarios"
-                  :key="i"
-                >
-                  <span class="material-symbols-outlined">
-                    check
-                  </span>
-                  {{ func }}
-                </li>
-              </ul>
+              <p v-if="funcionarioStore.erro" class="team-error">{{ funcionarioStore.erro }}</p>
+              <div v-else-if="funcionarioStore.funcionarios.length" class="team-options">
+                <label v-for="funcionario in funcionarioStore.funcionarios" :key="funcionario.id" class="team-option">
+                  <input v-model="funcionariosSelecionados" type="checkbox" :value="funcionario.id">
+                  <span><strong>{{ funcionario.nome }}</strong><small>{{ funcionario.cargo }}</small></span>
+                </label>
+                <button class="team-save" type="button" :disabled="salvandoEquipe" @click.stop="salvarEquipe">{{ salvandoEquipe ? 'Salvando…' : 'Salvar equipe' }}</button>
+                <p v-if="avisoEquipe" class="team-feedback" :class="{ error: erroEquipe }" role="status">{{ avisoEquipe }}</p>
+              </div>
+              <p v-else class="team-error">Nenhum funcionário cadastrado.</p>
             </div>
 
           </div>
@@ -243,13 +241,22 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useAppStore } from '@/stores/appStore.js'
+import { useFuncionarioStore } from '@/stores/funcionarios.js'
+import api from '@/api/config'
 
 const appStore = useAppStore()
+const funcionarioStore = useFuncionarioStore()
 
 const eventoDetalhe = ref(null)
 const dataFiltro = ref('')
+const funcionariosSelecionados = ref([])
+const salvandoEquipe = ref(false)
+const avisoEquipe = ref('')
+const erroEquipe = ref(false)
 
-onMounted(async () => { try { await appStore.carregarEventos() } catch { /* erro visível via store */ } })
+onMounted(async () => {
+  await Promise.allSettled([appStore.carregarEventos(), funcionarioStore.buscarFuncionarios()])
+})
 
 const eventosFiltrados = computed(() => {
   if (!dataFiltro.value) {
@@ -263,10 +270,44 @@ const eventosFiltrados = computed(() => {
 
 function abrirDetalhes(evento) {
   eventoDetalhe.value = evento
+  funcionariosSelecionados.value = (evento.funcionariosIds || []).map(Number)
+  avisoEquipe.value = ''
+  erroEquipe.value = false
 }
 
 function fecharDetalhes() {
   eventoDetalhe.value = null
+}
+
+async function salvarEquipe() {
+  if (!eventoDetalhe.value || salvandoEquipe.value) return
+  const evento = eventoDetalhe.value
+  const atuais = evento.equipeEvento || []
+  const selecionados = new Set(funcionariosSelecionados.value.map(Number))
+  const vinculados = new Set(atuais.map((vinculo) => Number(vinculo.funcionario)))
+  const incluir = [...selecionados].filter((id) => !vinculados.has(id))
+  const remover = atuais.filter((vinculo) => !selecionados.has(Number(vinculo.funcionario)))
+  salvandoEquipe.value = true
+  avisoEquipe.value = ''
+  erroEquipe.value = false
+  try {
+    await Promise.all([
+      ...incluir.map((funcionario) => api.post('/api/equipe-eventos/', { evento: evento.id, funcionario })),
+      ...remover.map((vinculo) => api.delete(`/api/equipe-eventos/${vinculo.id}/`)),
+    ])
+    await appStore.carregarEventos()
+    eventoDetalhe.value = appStore.eventos.find((item) => item.id === evento.id) || evento
+    funcionariosSelecionados.value = (eventoDetalhe.value.funcionariosIds || []).map(Number)
+    avisoEquipe.value = 'Equipe do evento atualizada.'
+  } catch (error) {
+    try { await appStore.carregarEventos() } catch { /* mantém os dados carregados antes da tentativa */ }
+    eventoDetalhe.value = appStore.eventos.find((item) => item.id === evento.id) || evento
+    funcionariosSelecionados.value = (eventoDetalhe.value.funcionariosIds || []).map(Number)
+    avisoEquipe.value = error.response?.data?.detail || 'Não foi possível atualizar a equipe do evento.'
+    erroEquipe.value = true
+  } finally {
+    salvandoEquipe.value = false
+  }
 }
 
 function formatarData(dataHora) {
@@ -591,4 +632,6 @@ function formatarData(dataHora) {
     grid-column: span 1;
   }
 }
+
+.team-options{display:grid;gap:9px}.team-option{display:flex;align-items:center;gap:10px;padding:9px 10px;border:1px solid #e8e7e4;border-radius:9px;background:#fff;cursor:pointer}.team-option input{accent-color:#a26e4f}.team-option span{display:grid;gap:2px}.team-option strong{font-size:.84rem}.team-option small,.team-feedback,.team-error{color:#777;font-size:.78rem}.team-save{min-height:38px;border:1px solid #ded6ce;border-radius:9px;background:#f8f5f1;color:#57463b;font:inherit;font-size:.83rem;font-weight:650;cursor:pointer}.team-save:hover{background:#efe7de}.team-save:focus-visible{outline:3px solid #d7b79c;outline-offset:2px}.team-save:disabled{opacity:.6;cursor:wait}.team-feedback{margin:0;color:#426d4d}.team-feedback.error,.team-error{color:#a33b32}:global(html.dark-mode) .team-option{background:#282d2f;border-color:#464b4d;color:#eee}:global(html.dark-mode) .team-option small{color:#b5b2ad}:global(html.dark-mode) .team-save{background:#353a3c;border-color:#53595b;color:#eee}:global(html.dark-mode) .team-save:hover{background:#414749}:global(html.dark-mode) .team-feedback{color:#abd0ae}:global(html.dark-mode) .team-feedback.error,:global(html.dark-mode) .team-error{color:#efa49a}
 </style>
