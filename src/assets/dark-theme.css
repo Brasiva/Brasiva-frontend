@@ -1,0 +1,91 @@
+html.dark-mode {
+  color-scheme: dark;
+  --theme-page: #181a1b;
+  --theme-surface: #222526;
+  --theme-surface-raised: #2b2e30;
+  --theme-border: #3d4244;
+  --theme-text: #f1efed;
+  --theme-muted: #b2aaa5;
+  --theme-accent: #e99563;
+}
+
+html.dark-mode,
+html.dark-mode body,
+html.dark-mode #app,
+html.dark-mode .page-layout,
+html.dark-mode .main-content,
+html.dark-mode .page-body,
+html.dark-mode .cardapio-page,
+html.dark-mode .budget-page,
+html.dark-mode .calendar-container {
+  background-color: var(--theme-page) !important;
+  color: var(--theme-text) !important;
+}
+
+html.dark-mode :is(
+  .settings-card, .setting-item, .about-box, .evento-card, .profile-card,
+  .metric-card, .pedido-card, .site-order, .card, .budget-card,
+  .modal-content, .modal-card, .modal-detalhe-prato, .detalhe-coluna-direita,
+  .detalhe-coluna-esquerda, .filters-card, .summary-card, .product-card,
+  .empty-state, .list-box, .category-group, .dish-mini-card, .order-summary
+) {
+  background-color: var(--theme-surface) !important;
+  color: var(--theme-text) !important;
+  border-color: var(--theme-border) !important;
+}
+
+html.dark-mode :is(
+  h1, h2, h3, h4, h5, h6, strong, label, .title, .dish-name,
+  .textos-topo h2, .card-heading h2, .preco-tag
+) {
+  color: var(--theme-text) !important;
+}
+
+html.dark-mode :is(
+  p, small, .subtitle, .muted, .dish-details, .dish-status,
+  .textos-topo p, .order-details p, .card-heading p, .category-group header p
+) {
+  color: var(--theme-muted) !important;
+}
+
+html.dark-mode :is(input, textarea, select) {
+  background-color: var(--theme-surface-raised) !important;
+  color: var(--theme-text) !important;
+  border-color: var(--theme-border) !important;
+}
+
+html.dark-mode :is(
+  .info-block, .info-box, .setting-icon, .section-icon, .summary,
+  .order-details, .order-items, .estimate, .category-tabs button,
+  .day-cell, .filters-card, .search-box
+) {
+  background-color: var(--theme-surface-raised) !important;
+  color: var(--theme-text) !important;
+  border-color: var(--theme-border) !important;
+}
+
+html.dark-mode :is(
+  .info-block span, .info-block strong, .setting-info strong,
+  .cardapio-page .categoria-label, .modal-detalhe-prato li,
+  .cardapio-page .dish-name, .calendar-header h2, .day-number
+) {
+  color: var(--theme-text) !important;
+}
+
+html.dark-mode :is(.sidebar, .mobile-sidebar, .mobile-sidebar-header, .mobile-sidebar-footer) {
+  background-color: #202324 !important;
+  color: var(--theme-text) !important;
+  border-color: var(--theme-border) !important;
+}
+
+html.dark-mode :is(.dish-mini-card:hover, .category-tabs button:hover, .setting-item:hover) {
+  background-color: #34383a !important;
+}
+
+html.dark-mode .dish-status.available {
+  color: #a7d7b0 !important;
+}
+
+html.dark-mode :is(.page-layout, .main-content, .page-body, .cardapio-page, .budget-page, .settings-card, .modal-content, .budget-card, .pedido-card, .dish-mini-card) {
+  transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+}

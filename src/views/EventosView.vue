@@ -141,6 +141,11 @@
               </span>
             </div>
 
+            <div v-if="eventoDetalhe.email" class="info-block">
+              <small>E-mail do cliente</small>
+              <span>{{ eventoDetalhe.email }}</span>
+            </div>
+
             <div>
               <span>#{{ eventoDetalhe.id }}</span>
               <h2>{{ eventoDetalhe.tipo }}</h2>
@@ -189,7 +194,11 @@
               </h4>
 
               <ul>
+                <li v-for="item in eventoDetalhe.itensPedido" :key="item.prato">
+                  {{ item.quantidade }} × {{ item.nome }}
+                </li>
                 <li
+                  v-if="!eventoDetalhe.itensPedido.length"
                   v-for="(item, i) in eventoDetalhe.cardapio"
                   :key="i"
                 >

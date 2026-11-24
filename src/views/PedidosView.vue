@@ -216,7 +216,7 @@ const appStore = useAppStore()
 
 const pedidoSelecionado = ref(null)
 const dataFiltro = ref('')
-const pedidosSite = computed(() => appStore.pedidos)
+const pedidosSite = computed(() => appStore.pedidos.filter((pedido) => !['aprovado', 'recusado'].includes(pedido.status)))
 const erroSite = computed(() => appStore.erros.pedidos || '')
 
 onMounted(async () => { try { await appStore.carregarPedidos() } catch { /* erro renderizado no painel */ } })
@@ -234,11 +234,14 @@ function moeda(valor) {
 }
 
 const pedidosFiltrados = computed(() => {
+  const pendentes = appStore.pedidos.filter(
+    pedido => !['aprovado', 'recusado'].includes(pedido.status)
+  )
   if (!dataFiltro.value) {
-    return appStore.pedidos
+    return pendentes
   }
 
-  return appStore.pedidos.filter(
+  return pendentes.filter(
     pedido => pedido.dataISO === dataFiltro.value
   )
 })
@@ -251,28 +254,26 @@ function fecharModal() {
   pedidoSelecionado.value = null
 }
 
-function recusarPedido() {
+async function recusarPedido() {
   if (!pedidoSelecionado.value) {
     return
   }
 
-  appStore.recusarPedido(
-    pedidoSelecionado.value.id
-  )
-
-  fecharModal()
+  try {
+    await appStore.recusarPedido(pedidoSelecionado.value.id)
+    fecharModal()
+  } catch { appStore.erros.pedidos = 'Não foi possível recusar o pedido.' }
 }
 
-function aceitarPedido() {
+async function aceitarPedido() {
   if (!pedidoSelecionado.value) {
     return
   }
 
-  appStore.aceitarPedido(
-    pedidoSelecionado.value
-  )
-
-  fecharModal()
+  try {
+    await appStore.aceitarPedido(pedidoSelecionado.value)
+    fecharModal()
+  } catch { appStore.erros.pedidos = 'Não foi possível encaminhar o pedido para Eventos e Orçamentos.' }
 }
 
 function formatarData(dataHora) {

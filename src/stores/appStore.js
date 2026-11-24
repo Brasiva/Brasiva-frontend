@@ -25,17 +25,28 @@ export const useAppStore = defineStore('app', () => {
   const produtos = ref([])
   const carregando = ref(false)
   const erros = ref({})
+  const temaEscuro = ref(localStorage.getItem('tema') === 'escuro')
   const pedidosPendentes = computed(() => pedidos.value.filter((pedido) => !['aprovado', 'recusado'].includes(pedido.status)).length)
   const eventosAgendados = computed(() => eventos.value.length)
   const totalProdutos = computed(() => produtos.value.length)
   const itensEstoqueBaixo = computed(() => produtos.value.filter((item) => Number(item.quantidade) <= Number(item.minimo)).length)
 
+  function definirTema(escuro) {
+    temaEscuro.value = Boolean(escuro)
+    document.documentElement.classList.toggle('dark-mode', temaEscuro.value)
+    localStorage.setItem('tema', temaEscuro.value ? 'escuro' : 'claro')
+  }
+
+  function inicializarTema() {
+    definirTema(temaEscuro.value)
+  }
+
   async function carregarPedidos() {
     try {
       pedidos.value = (await buscarTodas('/api/pedidos-site/')).map((item) => ({
-        ...item, tipo: item.tipo_evento, orcamento: dinheiro(item.total_estimado), cliente: item.nome,
-        contato: item.telefone, pessoas: item.convidados, dataHora: dataHora(`${item.data_evento}T12:00:00`),
-        dataISO: item.data_evento, hora: '', endereco: '', cardapio: item.itens.map((linha) => `${linha.quantidade} × ${linha.nome}`), funcionarios: [],
+        ...item, tipo: item.tipo_evento, orcamento: dinheiro(item.orcamento_final ?? item.total_estimado), cliente: item.nome,
+        contato: item.telefone, pessoas: item.convidados, dataHora: dataHora(`${item.data_evento}T${item.horario_evento || '12:00:00'}`),
+        dataISO: item.data_evento, hora: item.horario_evento || '', endereco: item.endereco_evento ? `${item.endereco_evento.logradouro}, ${item.endereco_evento.numero || 's/n'} - ${item.endereco_evento.bairro}, ${item.endereco_evento.cidade}/${item.endereco_evento.estado}` : '', cardapio: item.itens.map((linha) => `${linha.quantidade} x ${linha.nome}`), funcionarios: [],
       }))
       delete erros.value.pedidos
     } catch (error) { erros.value.pedidos = 'Não foi possível carregar as solicitações.'; throw error }
@@ -43,10 +54,10 @@ export const useAppStore = defineStore('app', () => {
 
   async function carregarEventos() {
     try {
-      const [eventosApi, clientes, vinculosCliente, enderecos, tipos, orcamentos, cardapios, equipe, pratos, listaFuncionarios] = await Promise.all([
+      const [eventosApi, clientes, vinculosCliente, enderecos, tipos, orcamentos, cardapios, equipe, pratos, listaFuncionarios, pedidosSite] = await Promise.all([
         buscarTodas('/api/eventos/'), buscarTodas('/api/clientes/'), buscarTodas('/api/cliente-eventos/'),
         buscarTodas('/api/enderecos/'), buscarTodas('/api/tipo-eventos/'), buscarTodas('/api/orcamento-eventos/'), buscarTodas('/api/cardapio-eventos/'),
-        buscarTodas('/api/equipe-eventos/'), buscarTodas('/api/pratos/'), buscarTodas('/api/funcionarios/'),
+        buscarTodas('/api/equipe-eventos/'), buscarTodas('/api/pratos/'), buscarTodas('/api/funcionarios/'), buscarTodas('/api/pedidos-site/'),
       ])
       eventos.value = eventosApi.map((evento) => {
         const vinculoCliente = vinculosCliente.find((item) => item.evento === evento.id)
@@ -57,11 +68,13 @@ export const useAppStore = defineStore('app', () => {
         const menus = cardapios.filter((item) => item.evento === evento.id)
         const pratoIds = menus.map((item) => item.prato)
         const equipeEvento = equipe.filter((item) => item.evento === evento.id)
+        const pedidoSite = pedidosSite.find((pedido) => pedido.evento === evento.id)
         const data = new Date(evento.data_hora)
         return {
-          ...evento, tipo: tipo?.nome || 'Evento', cliente: cliente?.nome || 'Cliente', contato: cliente?.telefone || '',
+          ...evento, tipo: tipo?.nome || 'Evento', cliente: cliente?.nome || 'Cliente', contato: cliente?.telefone || '', email: pedidoSite?.email || '', pedidoSite,
           pessoas: evento.quantidade_pessoas, dataHora: dataHora(evento.data_hora), dataISO: evento.data_hora.slice(0, 10),
           hora: data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+          itensPedido: pedidoSite?.itens || [],
           endereco: endereco ? `${endereco.logradouro}, ${endereco.numero || 's/n'} — ${endereco.bairro}, ${endereco.cidade}/${endereco.estado}` : '',
           orcamento: dinheiro(orcamento?.valor_total_orcamento ?? evento.taxa_utensilio),
           cardapio: pratos.filter((prato) => pratoIds.includes(prato.id)).map((prato) => prato.nome),
@@ -95,6 +108,7 @@ export const useAppStore = defineStore('app', () => {
     const { data } = await api.patch(`/api/pedidos-site/${id}/`, { status })
     const indice = pedidos.value.findIndex((pedido) => pedido.id === id)
     if (indice >= 0) pedidos.value[indice] = { ...pedidos.value[indice], ...data, tipo: data.tipo_evento, cliente: data.nome, pessoas: data.convidados, orcamento: dinheiro(data.total_estimado) }
+    if (status === 'aprovado') await Promise.all([carregarPedidos(), carregarEventos()])
     return data
   }
 
@@ -110,5 +124,5 @@ export const useAppStore = defineStore('app', () => {
     return '#e0e0e0'
   }
 
-  return { pedidos, eventos, produtos, carregando, erros, pedidosPendentes, eventosAgendados, totalProdutos, itensEstoqueBaixo, carregarPedidos, carregarEventos, carregarEstoque, carregarDashboard, aceitarPedido, recusarPedido, atualizarStatusPedido, getCorEvento }
+  return { pedidos, eventos, produtos, carregando, erros, temaEscuro, definirTema, inicializarTema, pedidosPendentes, eventosAgendados, totalProdutos, itensEstoqueBaixo, carregarPedidos, carregarEventos, carregarEstoque, carregarDashboard, aceitarPedido, recusarPedido, atualizarStatusPedido, getCorEvento }
 })

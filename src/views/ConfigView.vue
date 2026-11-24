@@ -115,50 +115,25 @@
   </div>
 </template>
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue'
+import { useAppStore } from '@/stores/appStore'
 
-const temaEscuro = ref(false);
-const notificacoes = ref(true);
-
-function aplicarTema() {
-  document.documentElement.classList.toggle(
-    'dark-mode',
-    temaEscuro.value
-  );
-
-  localStorage.setItem(
-    'tema',
-    temaEscuro.value ? 'escuro' : 'claro'
-  );
-}
+const appStore = useAppStore()
+const temaEscuro = computed(() => appStore.temaEscuro)
+const notificacoes = ref(true)
 
 function alternarTema() {
-  temaEscuro.value = !temaEscuro.value;
-  aplicarTema();
+  appStore.definirTema(!appStore.temaEscuro)
 }
 
 onMounted(() => {
-  // 1. Apenas lê se a chave existe e é igual a 'escuro'
-  const temaSalvo = localStorage.getItem('tema');
-
-  if (temaSalvo === 'escuro') {
-    temaEscuro.value = true;
-    document.documentElement.classList.add('dark-mode');
-  } else {
-    temaEscuro.value = false;
-    document.documentElement.classList.remove('dark-mode');
-  }
-
-  notificacoes.value =
-    localStorage.getItem('notificacoes') !== 'desativadas';
-});
+  appStore.inicializarTema()
+  notificacoes.value = localStorage.getItem('notificacoes') !== 'desativadas'
+})
 
 watch(notificacoes, (valor) => {
-  localStorage.setItem(
-    'notificacoes',
-    valor ? 'ativadas' : 'desativadas'
-  );
-});
+  localStorage.setItem('notificacoes', valor ? 'ativadas' : 'desativadas')
+})
 </script>
 <style scoped>
 .page-layout {

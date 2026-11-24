@@ -10,49 +10,31 @@
       <div class="acoes-cabecalho"><button @click="criarCategoria" class="btn-adicionar">+ Categoria</button><button @click="abrirModalNovoPrato" class="btn-adicionar"> + Adicionar Prato </button></div>
     </div>
     <!-- GRID DOS PRATOS -->
-    <div v-if="listaPratos.length" class="cardapio-grid">
-      <div
-      v-for="prato in listaPratos"
-      :key="prato.id"
-      class="prato-container">
-      <div
-        class="card-prato-compacto"
-        @click="selecionarPrato(prato.id)">
-        <div class="placeholder-imagem-card">
-          <i class="fa-solid fa-utensils"></i>
-        </div>
-
-        <div class="faixa-titulo">
-          {{ (prato.nome || '').toUpperCase() }}
-        </div>
-      </div>
+    <p v-if="cardapioStore.erro" class="erro-cardapio">{{ cardapioStore.erro }}</p>
+    <p v-else-if="cardapioStore.carregando" class="erro-cardapio">Carregando cardapio...</p>
+    <div v-else-if="!listaPratos.length" class="empty-state">
+      <h3>Nenhum prato cadastrado</h3>
+      <p>Clique em "Adicionar Prato" para cadastrar o primeiro.</p>
     </div>
-  </div>
-
-  <p v-if="cardapioStore.erro" class="erro-cardapio">{{ cardapioStore.erro }}</p>
-  <p v-else-if="cardapioStore.carregando" class="erro-cardapio">Carregando cardápio...</p>
-
-  <!-- ESTADO VAZIO -->
-  <div v-else class="empty-state">
-    <span class="material-symbols-outlined">
-      restaurant_menu
-    </span>
-
-    <h3>Nenhum prato cadastrado</h3>
-
-    <p>
-      Clique em "Adicionar Prato" para cadastrar o primeiro.
-    </p>
-  </div>
+    <section v-else class="category-groups">
+      <section v-for="categoria in categoriasComPratos" :key="categoria.id" class="category-group">
+        <header><div><h3>{{ categoria.nome }}</h3><p>{{ categoria.pratos.length }} {{ categoria.pratos.length === 1 ? 'prato' : 'pratos' }}</p></div></header>
+        <div class="dish-grid">
+          <button v-for="prato in categoria.pratos" :key="prato.id" class="dish-mini-card" @click="selecionarPrato(prato.id)">
+            <span class="dish-name">{{ prato.nome }}</span>
+            <span class="dish-details">{{ prato.sob_orcamento ? 'Sob orcamento' : `${moeda(prato.preco)} / ${prato.unidade}` }}</span>
+            <span class="dish-status" :class="{ available: prato.disponivel }">{{ prato.disponivel ? 'Disponivel no site' : 'Aguardando liberacao' }}</span>
+          </button>
+        </div>
+      </section>
+    </section>
 
         <!-- MODAL DE DETALHES DO PRATO -->
     <div v-if="pratoSelecionado" class="modal-overlay" @click.self="fecharDetalhes" >
       <div class="modal-detalhe-prato">
       <!-- COLUNA ESQUERDA -->
         <div class="detalhe-coluna-esquerda">
-          <div class="placeholder-imagem-detalhe">
-            <i class="fa-solid fa-bowl-food"></i>
-          </div>
+          <span class="detail-category">{{ pratoSelecionado.categoriaNome }}</span>
           <div class="modo-fazer-container">
             <h5>Modo de Fazer:</h5>
             <p> {{ pratoSelecionado.modoFazer || 'Nenhum modo de preparo detalhado para este prato.' }} </p>
@@ -135,6 +117,7 @@ const cardapioStore = useCardapioStore();
 const moeda = (valor) => valor == null ? 'Sob orçamento' : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(valor));
 // A lista de pratos agora vem da store
 const listaPratos = computed(() => cardapioStore.pratos);
+const categoriasComPratos = computed(() => cardapioStore.categorias.map((categoria) => ({ ...categoria, pratos: listaPratos.value.filter((prato) => String(prato.categoria) === String(categoria.id)) })).filter((categoria) => categoria.pratos.length));
 
 // CONTROLE DO PRATO SELECIONADO
 
@@ -677,4 +660,7 @@ const deletarPrato = async (id) => {
     grid-template-columns: 1fr; 
   }
 }
+
+.category-groups{display:grid;gap:22px}.category-group{padding:18px 20px;border:1px solid #e8e7e4;border-radius:16px;background:#fff;box-shadow:0 4px 14px #1d23290a}.category-group>header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.category-group h3{margin:0;color:#343638;font-size:1.05rem}.category-group header p{margin:4px 0 0;color:#85898d;font-size:.78rem}.dish-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}.dish-mini-card{display:grid;gap:8px;min-height:96px;padding:14px;text-align:left;border:1px solid #e8e7e4;border-radius:12px;background:#fff;cursor:pointer;transition:transform .18s,box-shadow .18s}.dish-mini-card:hover{transform:translateY(-2px);box-shadow:0 7px 18px #1d232912}.dish-name{font-size:.9rem;font-weight:700;color:#383532}.dish-details{font-size:.82rem;color:#6f716f}.dish-status{justify-self:start;padding:4px 8px;border-radius:20px;background:#f4eee8;color:#8a593f;font-size:.68rem;font-weight:700}.dish-status.available{background:#eaf3eb;color:#49714e}.detail-category{display:inline-flex;align-self:flex-start;padding:7px 10px;border-radius:18px;background:#f5eee9;color:#81513d;font-size:.8rem;font-weight:700}
+@media(max-width:600px){.category-group{padding:14px}.dish-grid{grid-template-columns:1fr 1fr}.dish-mini-card{padding:11px}}
 </style>
