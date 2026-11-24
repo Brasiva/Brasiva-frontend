@@ -109,19 +109,24 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to) => {
   const authStore = useAuthStore()
-  const estaAutenticado = !!authStore.token || !!localStorage.getItem('token')
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  const hasToken = !!authStore.token || !!localStorage.getItem('token')
 
-  if (to.matched.some(record => record.meta.requiresAuth) && !estaAutenticado) {
-    return next({ name: 'Login' })
+  if (requiresAuth && !hasToken) {
+    return { name: 'Login' }
   }
 
-  if (to.name === 'Login' && estaAutenticado) {
-    return next({ name: 'Home' })
+  if ((requiresAuth || to.name === 'Login') && hasToken) {
+    const validSession = authStore.usuario?.is_staff || await authStore.me()
+    if (!validSession || !authStore.usuario?.is_staff) {
+      authStore.logout()
+      if (requiresAuth) return { name: 'Login' }
+    } else if (to.name === 'Login') {
+      return { name: 'Home' }
+    }
   }
-
-  next()
 })
 
 export default router
